@@ -4,6 +4,7 @@ import collections
 import forest
 
 from . import basejobs
+from keys import JobKey, expkey
 from ..expcfg import hardware_cfg
 
 
@@ -21,35 +22,33 @@ job_desc_cfg._describe('key', instanceof=collections.Iterable, docstring='unique
 job_desc_cfg._describe('name', instanceof=str, docstring='unique name for the job')
 job_desc_cfg._branch('exploration', value=exp_desc_cfg.exploration._deepcopy())
 # del job_desc_cfg.exploration.seeds
-job_desc_cfg._branch('hardware', value=hardware_cfg._deepcopy())
-job_desc_cfg.hardware._describe('sensoryfile', instanceof=str, docstring='contains only effects (no motor command)')
+
+ex_hardware_cfg = hardware_cfg._deepcopy()
+ex_hardware_cfg._describe('sensoryfile', instanceof=str, docstring='contains only effects (no motor command)')
+job_desc_cfg._branch('hardware', value=ex_hardware_cfg._deepcopy())
 
 
 class ExplorationJob(basejobs.ConfigJob):
 
-    @classmethod
-    def make_jobcfg(cls, expcfg, rep):
-        jobkey = basejobs.JobKey(('exploration',), basejobs.expkey(expcfg), rep)
+    def make_jobcfg(self, expcfg, rep):
+        self.jobkey = JobKey(('exploration',), expkey(expcfg), rep)
 
-        jobcfg = job_desc_cfg._deepcopy()
-        jobcfg.key  = jobkey.key
-        jobcfg.name = jobkey.name
+        self.jobcfg = job_desc_cfg._deepcopy()
+        self.jobcfg.key  = self.jobkey.key
+        self.jobcfg.name = self.jobkey.name
 
         for k in ['ex_name', 'explorer', 'env_name', 'env', 'steps']:
-            jobcfg.exploration[k] = expcfg.exploration[k]
+            self.jobcfg.exploration[k] = expcfg.exploration[k]
 
-        jobcfg.hardware.configfile  = jobkey.filepath + '.cfg'
-        jobcfg.hardware.datafile    = jobkey.filepath + '.d'
-        jobcfg.hardware.sensoryfile = jobkey.filepath + '.fd'
-        jobcfg.hardware.logfile     = jobkey.filepath + '.log'
-        jobcfg.hardware.seed        = expcfg.exploration.seeds[rep]
-
-        return jobcfg
+        self.jobcfg.hardware.configfile  = self.jobkey.filepath + '.cfg'
+        self.jobcfg.hardware.datafile    = self.jobkey.filepath + '.d'
+        self.jobcfg.hardware.sensoryfile = self.jobkey.filepath + '.fd'
+        self.jobcfg.hardware.logfile     = self.jobkey.filepath + '.log'
+        self.jobcfg.hardware.seed        = expcfg.exploration.seeds[rep]
 
     def prepare(self, args):
         expcfg, rep = args
-        self.jobcfg = self.make_jobcfg(expcfg, rep)
-        self.rep = rep
+        self.make_jobcfg(expcfg, rep)
 
         self.add_input_file(self.jobcfg.hardware.configfile,        full=True)
         self.add_output_file(self.jobcfg.hardware.sensoryfile,      full=True)

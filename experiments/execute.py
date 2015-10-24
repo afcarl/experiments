@@ -50,7 +50,12 @@ def run_exp(cfg):
     ctx = context.Context(cfg.meta.rootpath, cfg.exp.path)
     grp = jobgroup.JobBatch(context.Env(user=cfg.meta.user))
 
+    ex_jobs = []
     for rep in range(cfg.exp.repetitions):
-        job = jobs.ExplorationJob(ctx, (), (cfg, rep), jobgroup=grp)
+        ex_jobs.append(jobs.ExplorationJob(ctx, (), (cfg, rep), jobgroup=grp))
+
+    for testname in cfg.tests._children_keys():
+        for ex_job in ex_jobs:
+            jobs.TestJob(ctx, (), (cfg, ex_job, testname), jobgroup=grp)
 
     grp_cmdline(grp)
