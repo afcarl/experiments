@@ -4,7 +4,7 @@ import collections
 import forest
 
 from . import basejobs
-from keys import JobKey, expkey
+from .keys import JobKey, expkey
 from ..expcfg import hardware_cfg
 
 

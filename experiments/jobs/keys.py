@@ -22,7 +22,7 @@ def kind2ext(kind):
     elif kind[0] == 'test':
         assert len(kind) >= 2, '{} is not at least of lenght 2'.format(kind)
         return '.{}'.format(kind[1])
-    elif kind[0] == 'results':
+    elif kind[0] == 'result':
         assert len(kind) >= 2, '{} is not at least of lenght 2'.format(kind)
         return '.{}.r'.format(kind[1])
 

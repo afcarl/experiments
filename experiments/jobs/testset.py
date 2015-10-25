@@ -5,7 +5,7 @@ import random
 import forest
 
 from . import basejobs
-from keys import JobKey, expkey
+from .keys import JobKey, expkey
 from ..expcfg import hardware_cfg
 
 
@@ -35,7 +35,7 @@ class TestsetJob(basejobs.ConfigJob):
 
         self.add_input_file(self.jobcfg.hardware.configfile,        full=True)
         self.add_output_file(self.jobcfg.hardware.datafile,         full=True)
-    
+
         self.rep        = 0
         self._name      = self.jobcfg.name
         self.key        = self.jobcfg.key

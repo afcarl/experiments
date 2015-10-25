@@ -6,6 +6,7 @@ from . import exploration
 from . import covtest
 from . import nntest
 from . import testset
+from . import result
 
 def run_job():
     cfg_filename = sys.argv[1]
@@ -23,3 +24,6 @@ def run_job():
 
     if kind == 'testset':
         testset.make_testset(cfg)
+
+    if kind == 'result':
+        result.compile_results(cfg)

@@ -61,4 +61,6 @@ def run_exp(cfg):
         for ex_job in ex_jobs:
             jobs.TestJob(ctx, (), (cfg, ex_job, testname), jobgroup=grp)
 
+        jobs.ResultJob(ctx, (), (cfg, testname), jobgroup=grp)
+
     grp_cmdline(grp)
