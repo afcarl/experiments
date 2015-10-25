@@ -54,6 +54,9 @@ def run_exp(cfg):
     for rep in range(cfg.exp.repetitions):
         ex_jobs.append(jobs.ExplorationJob(ctx, (), (cfg, rep), jobgroup=grp))
 
+    for testsetname in cfg.testsets._children_keys():
+        jobs.TestsetJob(ctx, (), (cfg, testsetname), jobgroup=grp)
+
     for testname in cfg.tests._children_keys():
         for ex_job in ex_jobs:
             jobs.TestJob(ctx, (), (cfg, ex_job, testname), jobgroup=grp)

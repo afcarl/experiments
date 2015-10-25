@@ -118,22 +118,3 @@ testset_cfg._describe('size', instanceof=numbers.Integral, docstring='number of 
     # Tests Configs #
 
 desc._branch('tests', strict=False)
-
-testkind_cfg = forest.Tree(strict=True)
-testkind_cfg._describe('kind', instanceof=str)
-testkind_cfg._describe('ticks', instanceof=collections.Iterable)
-
-testinv_cfg = testkind_cfg._deepcopy()
-testinv_cfg._describe('testset_name', docstring='name of the testset')
-testinv_cfg._describe('rep', instanceof=numbers.Integral, default=-1)
-
-learner_cfg = learners.ModelLearner.defcfg._copy(deep=True)
-learner_cfg.models.fwd = 'ES-LWLR'
-learner_cfg.models.inv = 'L-BFGS-B'
-testinv_cfg._branch('learner', value=learner_cfg)
-
-testnn_cfg = testkind_cfg._deepcopy()
-testnn_cfg._describe('testset_name', docstring='name of the testset')
-
-testcov_cfg = testkind_cfg._deepcopy()
-testcov_cfg._describe('buffer_size', instanceof=numbers.Real)

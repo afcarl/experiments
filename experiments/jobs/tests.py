@@ -16,7 +16,7 @@ testkind_cfg._describe('kind', instanceof=str)
 testkind_cfg._describe('ticks', instanceof=collections.Iterable)
 
 testinv_cfg = testkind_cfg._deepcopy()
-testinv_cfg._describe('testset_name', docstring='name of the testset')
+testinv_cfg._describe('testset', instanceof=str, docstring='name of the testset')
 testinv_cfg._describe('rep', instanceof=numbers.Integral, default=-1)
 
 learner_cfg = learners.ModelLearner.defcfg._copy(deep=True)
@@ -25,7 +25,7 @@ learner_cfg.models.inv = 'L-BFGS-B'
 testinv_cfg._branch('learner', value=learner_cfg)
 
 testnn_cfg = testkind_cfg._deepcopy()
-testnn_cfg._describe('testset_name', docstring='name of the testset')
+testnn_cfg._describe('testset', instanceof=str, docstring='name of the testset')
 
 testcov_cfg = testkind_cfg._deepcopy()
 testcov_cfg._describe('buffer_size', instanceof=numbers.Real)
@@ -43,6 +43,7 @@ job_desc_cfg._describe('testname', instanceof=str, docstring='name of the test')
 job_desc_cfg._branch('test', strict=False)
 # del job_desc_cfg.exploration.seeds
 job_desc_cfg._branch('hardware', value=hardware_cfg._deepcopy())
+job_desc_cfg._branch('hardware.testset', value=hardware_cfg._deepcopy())
 job_desc_cfg._branch('hardware.exploration', value=ex_hardware_cfg._deepcopy())
 
 
@@ -58,6 +59,10 @@ class TestJob(basejobs.ConfigJob):
 
         self.jobcfg.test = expcfg.tests[testname]
 
+        if 'testset' in self.jobcfg.test:
+            testset_job = self.jobgroup.jobs_byname['testset.{}'.format(self.jobcfg.test.testset)]
+            self.jobcfg.hardware.testset = testset_job.jobcfg.hardware._deepcopy()
+
         self.jobcfg.hardware.exploration = ex_job.jobcfg.hardware._deepcopy()
         self.jobcfg.hardware.datafile    = self.jobkey.filepath + '.d'
         self.jobcfg.hardware.configfile  = self.jobkey.filepath + '.cfg'
@@ -69,6 +74,9 @@ class TestJob(basejobs.ConfigJob):
         self.make_jobcfg(expcfg, ex_job, testname)
 
         self.add_input_file(self.jobcfg.hardware.configfile, full=True)
+        if 'datafile' in self.jobcfg.hardware.testset:
+            self.add_input_file(self.jobcfg.hardware.testset.datafile, full=True)
+
         if self.jobcfg.test.kind == 'inv':
             self.add_input_file(self.jobcfg.hardware.exploration.datafile, full=True)
         else:

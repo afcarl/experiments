@@ -1,4 +1,5 @@
 from __future__ import print_function, division, absolute_import
+import os
 
 import explorers
 import environments.envs
@@ -6,13 +7,14 @@ import environments.envs
 import dotdot
 import experiments
 
+import forest
 
 cfg = experiments.desc._deepcopy()
 cfg.meta.user='fbenurea'
 cfg.meta.rootpath='./rootpath/'
 cfg.meta.run_exploration=True
 
-cfg.exp.path = 'unit_tests/factory/'
+cfg.exp.path = 'unit_tests/'
 cfg.exp.prefix   = ('prefix',)
 cfg.exp.repetitions = 3
 
@@ -23,6 +25,15 @@ cfg.exploration.explorer = explorers.RandomMotorExplorer.defcfg._deepcopy()
 cfg.exploration.env_name = 'kin7_150'
 cfg.exploration.env      = environments.envs.KinematicArm2D.defcfg._deepcopy()
 cfg.exploration.deps     = ()
+
+cfg.testsets = forest.Tree()
+cfg.testsets['blabla.algorithm'] = 'fromfile'
+cfg.testsets['blabla.input_file'] = os.path.abspath('./testset_kin')
+
+cfg.tests.tnn = experiments.testnn_cfg._deepcopy()
+cfg.tests.tnn.testset = 'blabla'
+cfg.tests.tnn.kind = 'nn'
+cfg.tests.tnn.ticks = [i+1 for i in range(0, 1000, 25)]
 
 cfg.tests.tcov = experiments.testcov_cfg._deepcopy()
 cfg.tests.tcov.kind = 'cov'
