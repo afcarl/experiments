@@ -42,7 +42,7 @@ class ExplorationJob(basejobs.ConfigJob):
 
         self.jobcfg.hardware.configfile  = self.jobkey.filepath + '.cfg'
         self.jobcfg.hardware.datafile    = self.jobkey.filepath + '.d'
-        self.jobcfg.hardware.sensoryfile = self.jobkey.filepath + '.fd'
+        self.jobcfg.hardware.sensoryfile = self.jobkey.filepath + '.ds'
         self.jobcfg.hardware.logfile     = self.jobkey.filepath + '.log'
         self.jobcfg.hardware.seed        = expcfg.exploration.seeds[rep]
 
