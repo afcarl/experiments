@@ -46,9 +46,8 @@ def grp_cmdline(grp, script_name='run.sh', rep_modulo=(1, 0)):
 
 from clusterjobs import context, jobgroup
 
-def run_exp(cfg):
+def populate_grp(cfg, grp):
     ctx = context.Context(cfg.meta.rootpath, cfg.exp.path)
-    grp = jobgroup.JobBatch(context.Env(user=cfg.meta.user))
 
     ex_jobs = []
     for rep in range(cfg.exp.repetitions):
@@ -62,5 +61,12 @@ def run_exp(cfg):
             jobs.TestJob(ctx, (), (cfg, ex_job, testname), jobgroup=grp)
 
         jobs.ResultJob(ctx, (), (cfg, testname), jobgroup=grp)
+
+
+def run_exps(cfgs):
+    grp = jobgroup.JobBatch(context.Env(user=cfgs[0].meta.user))
+
+    for cfg in cfgs:
+        populate_grp(cfg, grp)
 
     grp_cmdline(grp)
