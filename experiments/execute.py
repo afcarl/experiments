@@ -2,6 +2,8 @@ import os, sys, stat
 import argparse
 import subprocess
 
+from clusterjobs import qstat
+
 from . import jobs
 
 def parser():
@@ -46,22 +48,36 @@ def grp_cmdline(grp, script_name='run.sh', rep_modulo=(1, 0)):
 
 from clusterjobs import context, jobgroup
 
-def populate_grp(cfg, grp):
+def populate_grp(cfg, grp=None):
     ctx = context.Context(cfg.meta.rootpath, cfg.exp.path)
+    if grp == None:
+        grp = jobgroup.JobBatch(context.Env(user=cfg.meta.user))
 
-    ex_jobs = []
+
+
+    jd = {'setup': [],
+          'explorations': [],
+          'testsets': {testset_name:[] for testset_name in cfg.testsets._children_keys()},
+          'tests': {test_name:[] for test_name in cfg.tests._children_keys()},
+          'results':{test_name:[] for test_name in cfg.tests._children_keys()}}
+
+    if qstat.qsub_available():
+        with open('run.pbs') as f:
+            pbs_script = f.read()
+        jd['setup'].append(jobs.SetupJob(ctx, (), (cfg, pbs_script), jobgroup=grp))
     for rep in range(cfg.exp.repetitions):
-        ex_jobs.append(jobs.ExplorationJob(ctx, (), (cfg, rep), jobgroup=grp))
+        jd['explorations'].append(jobs.ExplorationJob(ctx, (), (cfg, rep), jobgroup=grp))
 
     for testsetname in cfg.testsets._children_keys():
-        jobs.TestsetJob(ctx, (), (cfg, testsetname), jobgroup=grp)
+        jd['testsets'][testsetname].append(jobs.TestsetJob(ctx, (), (cfg, testsetname), jobgroup=grp))
 
     for testname in cfg.tests._children_keys():
-        for ex_job in ex_jobs:
-            jobs.TestJob(ctx, (), (cfg, ex_job, testname), jobgroup=grp)
+        for ex_job in jd['explorations']:
+            jd['tests'][testname].append(jobs.TestJob(ctx, (), (cfg, ex_job, testname), jobgroup=grp))
 
-        jobs.ResultJob(ctx, (), (cfg, testname), jobgroup=grp)
+        jd['results'][testname].append(jobs.ResultJob(ctx, (), (cfg, testname), jobgroup=grp))
 
+    return jd
 
 def run_exps(cfgs):
     grp = jobgroup.JobBatch(context.Env(user=cfgs[0].meta.user))

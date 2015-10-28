@@ -46,9 +46,12 @@ class JobKey(object):
         return '{}.{:02d}{}'.format(s, self.rep, kind2ext(self.kind))
 
     @property
+    def foldername(self):
+        return  '[{}]'.format(']['.join(self.exp_name))
+
+    @property
     def filepath(self):
-        s = '[{}]'.format(']['.join(self.exp_name))
-        return '{}/{}'.format(s, self.name)
+        return '{}/{}'.format(self.foldername, self.name)
 
 def expkey(cfg):
     return (tuple(cfg.exp.prefix) + (cfg.exploration.ex_name, cfg.exploration.env_name), cfg.exploration.deps, cfg.exp.repetitions)

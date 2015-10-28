@@ -38,24 +38,26 @@ def explore(cfg):
             ## Sources History ##
         src_m_channels = None
         src_datasets = []
-        # for src_filepath in cfg.hardware.src_files:
-        #     src_history = chrono.ChronoHistory(src_filepath,
-        #                                        extralog=False, verbose=True)
-        #     src_explorations = [(entry['data']['exploration'], entry['data']['feedback'])  for entry in src_history]
-        #     src_cfg          = src_history.meta['jobcfg']['exploration']
-        #     src_dataset  = {'m_channels'  : src_cfg.explorer.m_channels,
-        #                     's_channels'  : src_cfg.explorer.s_channels,
-        #                     'explorations': src_explorations}
-        #     src_datasets.append(src_dataset)
-        #
-        #     assert src_m_channels is None or src_m_channels == src_cfg.explorer.m_channels
-        #     src_m_channels = src_cfg.explorer.m_channels
-        #
+
+        for src_filepath in cfg.hardware.src_files:
+            src_history = chrono.ChronoHistory(src_filepath,
+                                               extralog=False, verbose=True)
+            src_explorations = [(entry['data']['exploration'], entry['data']['feedback'])  for entry in src_history]
+            src_cfg          = src_history.meta['jobcfg']['exploration']
+            src_dataset  = {'m_channels'  : src_cfg.explorer.m_channels,
+                            's_channels'  : src_cfg.explorer.s_channels,
+                            'explorations': src_explorations}
+            src_datasets.append(src_dataset)
+
+            print(src_cfg)
+            assert src_m_channels is None or src_m_channels == src_cfg.explorer.m_channels
+            src_m_channels = src_cfg.explorer.m_channels
+
 
             ## Instanciation of core modules ##
 
         env = environments.Environment.create(cfg.exploration.env)
-        assert len(src_datasets) == 0 or all(channels ==  env.m_channels for channels in src_m_channels), 'expected {}, got {}'.format(src_m_channels, env.m_channels)
+        assert len(src_datasets) == 0 or src_m_channels ==  env.m_channels, 'expected {}, got {}'.format(src_m_channels, env.m_channels)
 
         # to keep explorer uuid continuity
         existing_history = chrono.ChronoHistory(cfg.hardware.datafile, verbose=False)

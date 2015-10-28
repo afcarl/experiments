@@ -41,40 +41,35 @@ cfg.tests.tcov.ticks = [i+1 for i in range(0, 1000, 25)]
 cfg.tests.tcov.buffer_size = 0.05
 
 
+def reuse_ex(mb, p_reuse, algorithm='sensor_uniform', res=20, lrn_name='p0.05'):
+    import learners
+    assert 0 <= p_reuse <= 1
+
+    r_ex          = explorers.MetaExplorer.defcfg._deepcopy()
+    r_ex.eras     = (mb, None)
+    r_ex.weights  = ((1-p_reuse, 0.0, p_reuse), (0.0, 1.0, 0.0))
+
+    r_ex.ex_0                   = explorers.RandomMotorExplorer.defcfg._deepcopy()
+
+    r_ex.ex_1                   = explorers.RandomGoalExplorer.defcfg._deepcopy()
+    r_ex.ex_1.learner           = learners.DisturbLearner.defcfg._deepcopy()
+    r_ex.ex_1.learner.m_disturb = 0.05
+
+    r_ex.ex_2                   = explorers.ReuseExplorer.defcfg._deepcopy()
+    r_ex.ex_2.reuse.res         = res
+    r_ex.ex_2.reuse.algorithm   = algorithm
+
+    alg_str = '' if algorithm == 'sensor_uniform' else '.' + algorithm
+    return 'reuse{}_{}_{}_{}_{}'.format(alg_str, mb, p_reuse, res, lrn_name), r_ex
+
+
+tgt_cfg = cfg._deepcopy()
+tgt_cfg.exp.path = 'unit_tests2/'
+
+tgt_cfg.exploration.ex_name, tgt_cfg.exploration.explorer = reuse_ex(50, 0.5)
+tgt_cfg.exploration.deps = (experiments.expkey(cfg),)
+tgt_cfg.exp.prefix   = ('prefix', 'random.motor', 'kin7_150')
+
+
 if __name__ == '__main__':
-    experiments.run_exp(cfg)
-#    grp.prepare_hds()
-
-#
-#     # Tests Configs #
-#
-# desc._branch('tests', strict=False)
-# desc._branch('testsets', strict=False)
-#
-# test_cfg = forest.Tree()
-# test_cfg._describe('kind', instanceof=str)
-# test_cfg._describe('cfg', instanceof=str)
-#
-# testset_cfg = forest.Tree()
-# #testset_cfg._describe('hardware.testsetfile', instanceof=str, docstring='number of tests')
-# testset_cfg._describe('algorithm', instanceof=str, docstring='name of the algorithm to use to generate the testset')
-# testset_cfg._describe('size', instanceof=numbers.Integral, docstring='number of tests')
-#
-# testkind_cfg = forest.Tree()
-
-# testkind_cfg._describe('ticks', instanceof=collections.Iterable)
-#
-# testinv_cfg = testkind_cfg._deepcopy()
-# testinv_cfg._describe('testset_name', docstring='name of the testset')
-# testinv_cfg._describe('rep', instanceof=numbers.Integral, default=())
-#
-# learner_cfg = learners.ModelLearner.defcfg._copy(deep=True)
-# learner_cfg.models.fwd = 'ES-LWLR'
-# learner_cfg.models.inv = 'L-BFGS-B'
-# testinv_cfg._branch('learner', value=learner_cfg)
-#
-# testnn_cfg = testkind_cfg._deepcopy()
-# testnn_cfg._describe('testset_name', docstring='name of the testset')
-#
-# testcov_cfg = testkind_cfg._deepcopy()
-# testcov_cfg._describe('buffer_size', instanceof=numbers.Real)
+    experiments.run_exps([cfg, tgt_cfg])
