@@ -8,6 +8,8 @@ Copyright (c) 2014 INRIA. All rights reserved.
 """
 import time
 import os
+import datetime
+
 import atexit
 import threading
 from threading import Thread
@@ -20,6 +22,9 @@ class ChronoHistory(object):
     def __init__(self, core_filepath, extra_filepath=None, autosave_period=60, folder='',
                  core_keys=('exploration', 'feedback'), extralog=False, load=True,
                  verbose=False, meta=None):
+
+        if meta is None: meta = {}
+        meta['utc_created'] = datetime.datetime.utcnow()
 
         self.core_keys = core_keys
         self.extralog = extralog
@@ -187,6 +192,7 @@ class ChronoLog(object):
         filepath = os.path.join(self.folder, self.filename)
         self.lock.acquire()
         try:
+            self.meta['utc_saved'] = datetime.datetime.utcnow()
             datafile.save_file({'entries': self.entries, 'meta': self.meta},
                                filepath,
                                typename='data', verbose=verbose)
