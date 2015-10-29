@@ -1,15 +1,18 @@
 import os
 from distutils.core import setup
 
+import versioneer
+
 setup(
-    name = "experiments",
-    version = "1.0",
-    author = "Fabien Benureau",
+    name         = "experiments",
+    version      = "1.0",
+    cmdclass     = versioneer.get_cmdclass(),
+    author       = "Fabien Benureau",
     author_email = "fabien.benureau@gmail.com",
-    description = ("Library to run cluster (and non-cluster) experiments for articles"),
-    license = "Open Science License",
-    keywords = "clusters science",
-    url = "github.com/humm/experiments.git",
+    description  = ("Library to run cluster (and non-cluster) experiments for articles"),
+    license      = "Open Science License",
+    keywords     = "clusters science",
+    url          = "github.com/humm/experiments.git",
     packages=['experiments',
               'experiments.data',
               'experiments.jobs',
