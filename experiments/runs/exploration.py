@@ -8,7 +8,7 @@ import environments
 import explorers
 import learners
 
-from ..tools import chrono
+from ..tools import chrono, autosave
 
 
 def exploration_step(env, explorer, tries=3):
@@ -34,7 +34,6 @@ def load_existing_datafile(cfg, core_keys):
         history = chrono.ChronoHistory(cfg.hardware.datafile, cfg.hardware.logfile,
                                        core_keys=core_keys,
                                        extralog=cfg.hardware.logs,
-                                       autosave_period=cfg.hardware.autosave_period,
                                        verbose=True)
         # compare config.run with config
         assert history.meta['jobcfg.pristine'] == cfg
@@ -60,6 +59,7 @@ def load_src_files(cfg, env_m_channels):
 
 def explore(cfg):
     cfg_orig = cfg._deepcopy()
+    autosave.period = cfg.hardware.autosave_period
 
     try:
             ## Load Potentially Existing Data ##
@@ -100,9 +100,8 @@ def explore(cfg):
                                                  's_channels': env.s_channels,
                                                  'random_state': random.getstate()},
                                            core_keys=('exploration', 'feedback'),
-                                           extralog       =cfg.hardware.logs,
-                                           autosave_period=cfg.hardware.autosave_period,
-                                           verbose        =True)
+                                           extralog=cfg.hardware.logs,
+                                           verbose=True, load=False)
 
         # setting random state
         random.setstate(history.meta['random_state'])
@@ -110,26 +109,16 @@ def explore(cfg):
         # replaying history
         for entry in history:
             explorer.receive(entry['data']['exploration'], entry['data']['feedback'])
-        history.enable_autosave()
 
-        # class AutoSave(object):
-        #
-        #     def __init__(self, cfg):
-        #         self.last_save = time.time()
-        #         self.autosave_period = cfg.hardware.autosave_period
-        #
-        #     def autosave(self):
-        #         if time.time() > self.autosave_period + self.last_save:
-        #             self.last_save = time.time()
-        #             return True
-        #         return False
 
-        # running exploration
+        # running exploration; the next three lines are the core of the experiment.
         for t in range(len(history), cfg.exploration.steps):
             entry = exploration_step(env, explorer)
             history.add_entry(t, entry)
-            # if autosave.autosave():
-            #     # save history
+            if autosave.autosave():
+                # save history at regular intervals
+                history['random_state'] = random.getstate()
+                history.save()
 
 
             ## Finishing ##
