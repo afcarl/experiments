@@ -7,7 +7,7 @@ import environments.envs
 import dotdot
 import experiments
 
-import forest
+import scicfg
 
 cfg = experiments.desc._deepcopy()
 cfg.meta.user='fbenurea'
@@ -26,7 +26,7 @@ cfg.exploration.env_name = 'kin7_150'
 cfg.exploration.env      = environments.envs.KinematicArm2D.defcfg._deepcopy()
 cfg.exploration.deps     = ()
 
-cfg.testsets = forest.Tree()
+cfg.testsets = scicfg.SciConfig()
 cfg.testsets['blabla.algorithm'] = 'fromfile'
 cfg.testsets['blabla.input_file'] = os.path.abspath('./testset_kin')
 

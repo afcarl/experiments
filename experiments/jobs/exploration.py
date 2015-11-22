@@ -2,14 +2,14 @@ import os
 import numbers
 import collections
 
-import forest
+import scicfg
 
 from . import basejobs
 from .keys import JobKey, expkey
 from ..expcfg import hardware_cfg
 
 
-exp_desc_cfg = forest.Tree(strict=True)
+exp_desc_cfg = scicfg.SciConfig(strict=True)
 exp_desc_cfg._branch('exploration.explorer', strict=False)
 exp_desc_cfg._branch('exploration.env', strict=False)
 exp_desc_cfg._describe('exploration.ex_name', instanceof=str, docstring='the name of the explorer')
@@ -17,7 +17,7 @@ exp_desc_cfg._describe('exploration.env_name', instanceof=str, docstring='the na
 exp_desc_cfg._describe('exploration.steps', instanceof=numbers.Integral, docstring='the number of trials')
 exp_desc_cfg._describe('exploration.seeds', instanceof=collections.Iterable, docstring='random seeds')
 
-job_desc_cfg = forest.Tree(strict=True)
+job_desc_cfg = scicfg.SciConfig(strict=True)
 job_desc_cfg._describe('key', instanceof=collections.Iterable, docstring='unique key for the job')
 job_desc_cfg._describe('rep', instanceof=numbers.Integral, docstring='job repetition number')
 #job_desc_cfg._describe('key', instanceof=numbers.Integer, docstring='repetition number')

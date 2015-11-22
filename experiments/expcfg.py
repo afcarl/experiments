@@ -3,11 +3,11 @@ from __future__ import print_function, division, absolute_import
 import collections
 import numbers
 
-import forest
+import scicfg
 import learners
 
 
-desc = forest.Tree(strict=True)
+desc = scicfg.SciConfig(strict=True)
 
 
 
@@ -88,7 +88,7 @@ desc._describe('exp.deps', instanceof=collections.Iterable, default=(),
 
     # Hardware Config #
 
-hardware_cfg = forest.Tree(strict=True)
+hardware_cfg = scicfg.SciConfig(strict=True)
 hardware_cfg._describe('configfile',  instanceof=str, docstring='configuration file for exploration')
 hardware_cfg._describe('datafile',    instanceof=str, docstring='configuration file for exploration')
 hardware_cfg._describe('seed',        instanceof=numbers.Integral, docstring='random seed for repeatable experiments')
@@ -109,7 +109,7 @@ desc._describe('exploration.seeds', instanceof=collections.Iterable, docstring='
 
 desc._branch('testsets')
 
-testset_cfg = forest.Tree(strict=True)
+testset_cfg = scicfg.SciConfig(strict=True)
 #testset_cfg._describe('hardware.testsetfile', instanceof=str, docstring='number of tests')
 testset_cfg._describe('algorithm', instanceof=str, docstring='name of the algorithm to use to generate the testset')
 testset_cfg._describe('size', instanceof=numbers.Integral, docstring='number of tests')

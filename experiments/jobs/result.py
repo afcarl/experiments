@@ -2,7 +2,7 @@ import numbers
 import collections
 import random
 
-import forest
+import scicfg
 import learners
 
 from . import basejobs
@@ -11,7 +11,7 @@ from ..expcfg import hardware_cfg
 from .exploration import ex_hardware_cfg
 
 
-job_desc_cfg = forest.Tree(strict=True)
+job_desc_cfg = scicfg.SciConfig(strict=True)
 job_desc_cfg._describe('key', instanceof=collections.Iterable, docstring='unique key for the job')
 job_desc_cfg._describe('name', instanceof=str, docstring='unique name for the job')
 job_desc_cfg._describe('rep', instanceof=numbers.Integral, docstring='number of tests')

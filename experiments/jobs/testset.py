@@ -2,14 +2,14 @@ import numbers
 import collections
 import random
 
-import forest
+import scicfg
 
 from . import basejobs
 from .keys import JobKey, expkey
 from ..expcfg import hardware_cfg
 
 
-job_desc_cfg = forest.Tree(strict=True)
+job_desc_cfg = scicfg.SciConfig(strict=True)
 job_desc_cfg._describe('key', instanceof=collections.Iterable, docstring='unique key for the job')
 job_desc_cfg._describe('name', instanceof=str, docstring='unique name for the job')
 job_desc_cfg._branch('testset', strict=False)

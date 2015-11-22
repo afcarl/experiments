@@ -20,5 +20,5 @@ setup(
               'experiments.tools'],
     #long_description=read('README'),
     classifiers=[],
-    requires=['clusterjobs', 'forest', 'explorers', 'environments', 'learners']
+    requires=['clusterjobs', 'scicfg', 'explorers', 'environments', 'learners']
 )
