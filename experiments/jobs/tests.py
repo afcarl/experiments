@@ -60,7 +60,7 @@ class TestJob(basejobs.ConfigJob):
         self.jobcfg.test = expcfg.tests[testname]
 
         if 'testset' in self.jobcfg.test:
-            testset_job = self.jobgroup.jobs_byname['testset.{}'.format(self.jobcfg.test.testset)]
+            testset_job = self.jobgroup.jobs_byname[self.context.relpath('testset.{}'.format(self.jobcfg.test.testset))]
             self.jobcfg.hardware.testset = testset_job.jobcfg.hardware._deepcopy()
 
         self.jobcfg.hardware.exploration = ex_job.jobcfg.hardware._deepcopy()

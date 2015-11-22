@@ -21,7 +21,7 @@ class TestsetJob(basejobs.ConfigJob):
     def make_jobcfg(self, expcfg, testset_name):
         self.jobcfg = job_desc_cfg._deepcopy()
         self.jobcfg.key  = (('testset',), testset_name, 0)
-        self.jobcfg.name = 'testset.{}'.format(testset_name)
+        self.jobcfg.name = self.context.relpath('testset.{}'.format(testset_name))
 
         self.jobcfg.testset = expcfg.testsets[testset_name]
 
