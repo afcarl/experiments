@@ -70,7 +70,7 @@ def explore(cfg):
         else:
             # replace config by the previous (matching) config,
             # as it contains non-reproductible explorers uuids, and tracking data.
-            cfg = history.meta['jobcfg.track']
+            cfg = history.meta['jobcfg']
 
         random.seed(cfg.hardware.seed)
 
@@ -93,6 +93,10 @@ def explore(cfg):
             ## Running learning ##
 
         if history is None:
+            #TODO
+            #cfg.tracking.platform = tracking.track_info(cfg.tracking.module_names)
+            #cfg.tracking.env      = env.tracking()
+
             history = chrono.ChronoHistory(cfg.hardware.datafile, cfg.hardware.logfile,
                                            meta={'jobcfg.pristine': cfg_orig,
                                                  'jobcfg': cfg,

@@ -30,6 +30,7 @@ ex_hardware_cfg._describe('sensoryfile', instanceof=str, docstring='contains onl
 ex_hardware_cfg._describe('src_files', instanceof=collections.Iterable, docstring='files of reused datasets')
 job_desc_cfg._branch('hardware', value=ex_hardware_cfg._deepcopy())
 
+job_desc_cfg._branch('provenance', strict=False)
 
 class ExplorationJob(basejobs.ConfigJob):
 

@@ -33,11 +33,11 @@ cfg.testsets['blabla.input_file'] = os.path.abspath('./testset_kin')
 cfg.tests.tnn = experiments.testnn_cfg._deepcopy()
 cfg.tests.tnn.testset = 'blabla'
 cfg.tests.tnn.kind = 'nn'
-cfg.tests.tnn.ticks = [i+1 for i in range(0, 1000, 25)]
+cfg.tests.tnn.ticks = [1, 2, 3, 4, 5, 10, 15, 20] + [i for i in range(25, cfg.exploration.steps+1, 25)]
 
 cfg.tests.tcov = experiments.testcov_cfg._deepcopy()
 cfg.tests.tcov.kind = 'cov'
-cfg.tests.tcov.ticks = [i+1 for i in range(0, 1000, 25)]
+cfg.tests.tcov.ticks = [1, 2, 3, 4, 5, 10, 15, 20] + [i for i in range(25, cfg.exploration.steps+1, 25)]
 cfg.tests.tcov.buffer_size = 0.05
 
 
