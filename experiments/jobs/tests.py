@@ -19,9 +19,7 @@ testinv_cfg = testkind_cfg._deepcopy()
 testinv_cfg._describe('testset', instanceof=str, docstring='name of the testset')
 testinv_cfg._describe('rep', instanceof=numbers.Integral, default=-1)
 
-learner_cfg = learners.ModelLearner.defcfg._copy(deep=True)
-learner_cfg.models.fwd = 'ES-LWLR'
-learner_cfg.models.inv = 'L-BFGS-B'
+learner_cfg = learners.OptimizeLearner.defcfg._deepcopy()
 testinv_cfg._branch('learner', value=learner_cfg)
 
 testnn_cfg = testkind_cfg._deepcopy()

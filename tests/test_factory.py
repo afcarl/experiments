@@ -52,8 +52,9 @@ def reuse_ex(mb, p_reuse, algorithm='sensor_uniform', res=20, lrn_name='p0.05'):
     r_ex.ex_0                   = explorers.RandomMotorExplorer.defcfg._deepcopy()
 
     r_ex.ex_1                   = explorers.RandomGoalExplorer.defcfg._deepcopy()
-    r_ex.ex_1.learner           = learners.DisturbLearner.defcfg._deepcopy()
-    r_ex.ex_1.learner.m_disturb = 0.05
+    r_ex.ex_1.learner           = learners.MutateNNLearner.defcfg._deepcopy()
+    r_ex.ex_1.learner.operator.name = 'uniform'
+    r_ex.ex_1.learner.operator.d    = 0.05
 
     r_ex.ex_2                   = explorers.ReuseExplorer.defcfg._deepcopy()
     r_ex.ex_2.reuse.res         = res
