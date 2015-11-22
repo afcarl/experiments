@@ -16,6 +16,7 @@ setup(
     packages=['experiments',
               'experiments.data',
               'experiments.jobs',
+              'experiments.provenance',
               'experiments.runs',
               'experiments.tools'],
     #long_description=read('README'),
