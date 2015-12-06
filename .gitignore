@@ -1,6 +1,6 @@
 .fuse_hidden*
 *.bz2
-tests/rootpath
+test/rootpath
 
 .DS_Store
 *.py[cod]
