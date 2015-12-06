@@ -116,7 +116,7 @@ def explore(cfg):
         if history is not None:
             check_provenance(cfg, prov_cfg)
         else:
-            cfg.provenance.update(prov_cfg, overwrite=True)
+            cfg.provenance._update(prov_cfg, overwrite=True)
 
             history = chrono.ChronoHistory(cfg.hardware.datafile, cfg.hardware.logfile,
                                            meta={'jobcfg.pristine': cfg_orig,
