@@ -2,6 +2,8 @@ import collections
 import platform
 import importlib
 
+import git
+
 import scicfg
 
 
@@ -59,6 +61,12 @@ def check_dirty(module_cfg):
     if len(dirty_mods) > 0:
         raise ValueError("the following modules are dirty: {}. Won't proceed.".format(dirty_mods))
 
-if __name__ == '__main__':
-    print(modules(['explorers', 'learners', 'environments']))
-    print(platform_info())
+def git_commit(working_dir):
+    """Return the SHA1 of the current commit"""
+    repo = git.Repo(working_dir)
+    return repo.head.commit
+
+def git_dirty(working_dir):
+    """Return True if dirty"""
+    repo = git.Repo(working_dir)
+    return repo.is_dirty()

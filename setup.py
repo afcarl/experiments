@@ -22,5 +22,5 @@ setup(
               'experiments.tools'],
     #long_description=read('README'),
     classifiers=[],
-    install_requires=['clusterjobs', 'scicfg', 'explorers', 'environments', 'learners'],
+    install_requires=['clusterjobs', 'scicfg', 'explorers', 'environments', 'learners', 'gitpython'],
 )
