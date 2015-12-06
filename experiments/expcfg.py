@@ -19,6 +19,11 @@ desc._describe('meta.user', instanceof=str,
 desc._describe('meta.rootpath', instanceof=str,
                docstring='the path towards the data')
 
+desc._describe('meta.module_names', instanceof=collections.Iterable,
+               docstring='list of modules involved in the experiment, for tracking purposes',
+               default=('experiments', 'clusterjobs', 'scicfg',
+                        'learners', 'explorers', 'enviroments',
+                        'scipy', 'numpy'))
 
 desc._describe('meta.run_exploration', instanceof=bool, default=True,
                docstring='run the exploration')

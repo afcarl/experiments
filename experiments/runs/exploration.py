@@ -59,11 +59,7 @@ def load_src_files(cfg, env_m_channels):
 
     return src_datasets
 
-def gather_provenance(env, check_dirty=True):
-    mod_names = ['explorers', 'environments', 'learners', 'scicfg',
-                 'experiments', 'clusterjobs', 'dovecot',
-                 'scipy', 'numpy']
-
+def gather_provenance(mod_names, env, check_dirty=True):
     prov_cfg = scicfg.SciConfig()
     prov_cfg.modules  = provenance.modules_provenance(mod_names)
     prov_cfg.platform = provenance.platform_info()
@@ -114,7 +110,7 @@ def explore(cfg):
 
             ## Running learning ##
 
-        prov_cfg = gather_provenance(env, check_dirty=True)
+        prov_cfg = gather_provenance(cfg.meta.module_names, env, check_dirty=True)
 
         if history is not None:
             check_provenance(cfg, prov_cfg)
