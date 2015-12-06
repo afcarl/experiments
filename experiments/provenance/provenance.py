@@ -26,40 +26,43 @@ def platform_info():
     return cfg
 
 
-mod_desc = scicfg.SciConfig(strict=True)
-mod_desc._describe('version', instanceof=(str, unicode))
-mod_desc._describe('commit', instanceof=(str, unicode))
-mod_desc._describe('dirty', instanceof=bool)
+pkg_desc = scicfg.SciConfig(strict=True)
+pkg_desc._describe('version', instanceof=(str, unicode))
+pkg_desc._describe('commit', instanceof=(str, unicode))
+pkg_desc._describe('dirty', instanceof=bool)
 
-def modules_provenance(module_names):
+def packages_info(package_names):
     cfg = scicfg.SciConfig(strict=False)
-    for mod_name in module_names:
-        mod = importlib.import_module(mod_name) # we don't catch the exceptions by design
-        mod_cfg = mod_desc._deepcopy()
-        mod_cfg.version = mod.__version__ # __version__ is *required*
+    for pkg_name in package_names:
+        pkg = importlib.import_module(pkg_name) # we don't catch the exceptions by design
+        pkg_cfg = pkg_desc._deepcopy()
+        pkg_cfg.version = pkg.__version__ # __version__ is *required*
         try:
-            mod_cfg.commit = mod.__commit__
+            pkg_cfg.commit = pkg.__commit__
         except AttributeError:
             pass
         try:
-            mod_cfg.dirty = mod.__dirty__
+            pkg_cfg.dirty = pkg.__dirty__
         except AttributeError:
             pass
-        cfg[mod_name] = mod_cfg
+        cfg[pkg_name] = pkg_cfg
 
     return cfg
 
-def check_dirty(module_cfg):
-    dirty_mods = []
-    for mod_name, cfg in module_cfg._branches:
-        print(cfg)
+def check_dirty(provenance_cfg):
+    dirty_pkgs = []
+    for pkg_name, cfg in provenance_cfg.packages._branches:
         try:
             if cfg.dirty:
-                dirty_mods.append(mod_name)
+                dirty_pkgs.append(pkg_name)
         except KeyError:
             pass
-    if len(dirty_mods) > 0:
-        raise ValueError("the following modules are dirty: {}. Won't proceed.".format(dirty_mods))
+    for code_name, cfg in provenance_cfg.code._branches:
+        if cfg.dirty:
+            dirty_pkgs.append(code_name)
+
+    if len(dirty_pkgs) > 0:
+        raise ValueError("the following packages have dirty gits: {}. Won't proceed.".format(dirty_pkgs))
 
 def git_commit(working_dir):
     """Return the SHA1 of the current commit"""

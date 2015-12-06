@@ -23,4 +23,7 @@ setup(
     #long_description=read('README'),
     classifiers=[],
     install_requires=['clusterjobs', 'scicfg', 'explorers', 'environments', 'learners', 'gitpython'],
+
+    # in order to avoid 'zipimport.ZipImportError: bad local file header'
+    zip_safe=False,
 )

@@ -37,6 +37,12 @@ desc._describe('meta.run_nns', instanceof=bool, default=False,
 desc._describe('meta.run_coverage', instanceof=bool, default=True,
                docstring='run the nn tests')
 
+    # Provenance #
+
+desc._describe('provenance.package_names', instanceof=collections.Iterable, default=(),
+               docstring='python packages involved in the experiment (for tracking)')
+desc._branch('provenance.code', strict=False)
+
 
     # Qsub #
 

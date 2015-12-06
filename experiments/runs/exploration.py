@@ -59,21 +59,22 @@ def load_src_files(cfg, env_m_channels):
 
     return src_datasets
 
-def gather_provenance(mod_names, env, check_dirty=True):
+def gather_provenance(cfg, env, check_dirty=True):
     prov_cfg = scicfg.SciConfig()
-    prov_cfg.modules  = provenance.modules_provenance(mod_names)
+    prov_cfg.packages = provenance.packages_info(cfg.provenance.package_names)
     prov_cfg.platform = provenance.platform_info()
     prov_cfg.env      = env.info()
+    prov_cfg.code     = cfg.provenance._get('code', scicfg.SciConfig())
 
     if check_dirty:
-        provenance.check_dirty(prov_cfg.modules)
+        provenance.check_dirty(prov_cfg)
 
     return prov_cfg
 
 def check_provenance(cfg, prov_cfg):
-    assert cfg.provenance.modules == prof_cfg.modules
-    assert cfg.platform.python    == prof_cfg.python
-    assert cfg.env                == prof_cfg.env
+    assert cfg.provenance.packages == prof_cfg.packages
+    assert cfg.platform.python     == prof_cfg.python
+    assert cfg.env                 == prof_cfg.env
 
 def explore(cfg):
     cfg_orig = cfg._deepcopy()
@@ -110,12 +111,12 @@ def explore(cfg):
 
             ## Running learning ##
 
-        prov_cfg = gather_provenance(cfg.meta.module_names, env, check_dirty=True)
+        prov_cfg = gather_provenance(cfg, env, check_dirty=True)
 
         if history is not None:
             check_provenance(cfg, prov_cfg)
         else:
-            cfg.provenance = prov_cfg
+            cfg.provenance.update(prov_cfg, overwrite=True)
 
             history = chrono.ChronoHistory(cfg.hardware.datafile, cfg.hardware.logfile,
                                            meta={'jobcfg.pristine': cfg_orig,

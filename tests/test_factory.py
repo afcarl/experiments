@@ -13,9 +13,9 @@ cfg = experiments.desc._deepcopy()
 cfg.meta.user='fbenurea'
 cfg.meta.rootpath='./rootpath/'
 cfg.meta.run_exploration=True
-cfg.meta.module_names = ('experiments', 'clusterjobs', 'scicfg',
-                         'learners', 'explorers', 'enviroments',
-                         'scipy', 'numpy')
+cfg.provenance.package_names = ('experiments', 'clusterjobs', 'scicfg',
+                                'learners', 'explorers', 'environments',
+                                'scipy', 'numpy')
 
 cfg.exp.path = 'unit_tests/'
 cfg.exp.prefix   = ('prefix',)

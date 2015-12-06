@@ -42,6 +42,9 @@ class ExplorationJob(basejobs.ConfigJob):
         self.jobcfg.rep  = self.jobkey.rep
         self.jobcfg.name = self.jobkey.name
 
+        self.jobcfg.provenance.package_names = expcfg.provenance.package_names
+        self.jobcfg.provenance.code          = expcfg.provenance.code
+
         for k in ['ex_name', 'explorer', 'env_name', 'env', 'steps', 'deps']:
             self.jobcfg.exploration[k] = expcfg.exploration[k]
 
