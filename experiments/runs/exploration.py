@@ -3,12 +3,14 @@ from __future__ import print_function, absolute_import
 import random
 import sys
 
+import scicfg
 from clusterjobs import datafile
 import environments
 import explorers
 import learners
 
 from ..tools import chrono, autosave
+from .. import provenance
 
 
 def exploration_step(env, explorer, tries=3):
@@ -57,19 +59,39 @@ def load_src_files(cfg, env_m_channels):
 
     return src_datasets
 
+def gather_provenance(env, check_dirty=True):
+    mod_names = ['explorers', 'environments', 'learners', 'scicfg',
+                 'experiments', 'clusterjobs', 'dovecot',
+                 'scipy', 'numpy']
+
+    prov_cfg = scicfg.SciConfig()
+    prov_cfg.modules  = provenance.modules_provenance(mod_names)
+    prov_cfg.platform = provenance.platform_info()
+    prov_cfg.env      = env.info()
+
+    if check_dirty:
+        provenance.check_dirty(prov_cfg.modules)
+
+    return prov_cfg
+
+def check_provenance(cfg, prov_cfg):
+    assert cfg.provenance.modules == prof_cfg.modules
+    assert cfg.platform.python    == prof_cfg.python
+    assert cfg.env                == prof_cfg.env
+
 def explore(cfg):
     cfg_orig = cfg._deepcopy()
     autosave.period = cfg.hardware.autosave_period
 
     try:
-            ## Load Potentially Existing Data ##
+            ## Load potentially existing data ##
         history = load_existing_datafile(cfg, core_keys=('exploration', 'feedback'))
         if history is None:
             # set a random seed if none already set.
             cfg.hardware._setdefault('seed', random.randint(0, 9223372036854775807)) # sys.maxint
         else:
             # replace config by the previous (matching) config,
-            # as it contains non-reproductible explorers uuids, and tracking data.
+            # as it contains non-reproductible explorers uuids, and provenance data.
             cfg = history.meta['jobcfg']
 
         random.seed(cfg.hardware.seed)
@@ -92,10 +114,12 @@ def explore(cfg):
 
             ## Running learning ##
 
-        if history is None:
-            #TODO
-            #cfg.tracking.platform = tracking.track_info(cfg.tracking.module_names)
-            #cfg.tracking.env      = env.tracking()
+        prov_cfg = gather_provenance(env, check_dirty=True)
+
+        if history is not None:
+            check_provenance(cfg, prov_cfg)
+        else:
+            cfg.provenance = prov_cfg
 
             history = chrono.ChronoHistory(cfg.hardware.datafile, cfg.hardware.logfile,
                                            meta={'jobcfg.pristine': cfg_orig,

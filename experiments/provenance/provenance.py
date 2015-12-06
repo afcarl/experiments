@@ -50,6 +50,7 @@ def modules_provenance(module_names):
 def check_dirty(module_cfg):
     dirty_mods = []
     for mod_name, cfg in module_cfg._branches:
+        print(cfg)
         try:
             if cfg.dirty:
                 dirty_mods.append(mod_name)
