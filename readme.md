@@ -1,4 +1,4 @@
-## experiments - a experimental framework
+## experiments - an experimental framework
 
 The `experiments` library was written to launch scientific experiments based on the [`environments`](https://github.com/humm/environments) and [`learners`](https://github.com/humm/learners)
 and [`explorers`](https://github.com/humm/explorers) modules in particular. It provides a flexible interface to configure and launch experiments on a local machine or a cluster, and possess extensive provenance capacities.

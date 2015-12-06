@@ -1,18 +1,19 @@
-import os
-from distutils.core import setup
+from setuptools import setup
 
 import versioneer
 
+VERSION = '1.0'
+
 setup(
     name         = "experiments",
-    version      = "1.0",
+    version      = VERSION,
     cmdclass     = versioneer.get_cmdclass(),
     author       = "Fabien Benureau",
     author_email = "fabien.benureau@gmail.com",
-    description  = ("Library to run cluster (and non-cluster) experiments for articles"),
+    description  = "Library to run cluster (and non-cluster) experiments for articles",
     license      = "Open Science License",
     keywords     = "clusters science",
-    url          = "github.com/humm/experiments.git",
+    url          = "https://github.com/humm/experiments.git",
     packages=['experiments',
               'experiments.data',
               'experiments.jobs',
@@ -21,5 +22,5 @@ setup(
               'experiments.tools'],
     #long_description=read('README'),
     classifiers=[],
-    requires=['clusterjobs', 'scicfg', 'explorers', 'environments', 'learners']
+    install_requires=['clusterjobs', 'scicfg', 'explorers', 'environments', 'learners'],
 )
