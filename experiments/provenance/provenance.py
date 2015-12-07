@@ -67,7 +67,7 @@ def check_dirty(provenance_cfg):
 def git_commit(working_dir):
     """Return the SHA1 of the current commit"""
     repo = git.Repo(working_dir)
-    return repo.head.commit
+    return repo.head.commit.hexsha
 
 def git_dirty(working_dir):
     """Return True if dirty"""

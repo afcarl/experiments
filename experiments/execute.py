@@ -56,8 +56,8 @@ def populate_grp(cfg, grp=None):
     jd = {'setup': [],
           'explorations': [],
           'testsets': {testset_name:[] for testset_name in cfg.testsets._children_keys()},
-          'tests': {test_name:[] for test_name in cfg.tests._children_keys()},
-          'results':{test_name:[] for test_name in cfg.tests._children_keys()}}
+          'tests':    {test_name:[] for test_name in cfg.tests._children_keys()},
+          'results':  {test_name:[] for test_name in cfg.tests._children_keys()}}
 
     if qstat.qsub_available():
         with open('run.pbs') as f:
@@ -66,14 +66,15 @@ def populate_grp(cfg, grp=None):
     for rep in range(cfg.exp.repetitions):
         jd['explorations'].append(jobs.ExplorationJob(ctx, (), (cfg, rep), jobgroup=grp))
 
-    for testsetname in cfg.testsets._children_keys():
-        jd['testsets'][testsetname].append(jobs.TestsetJob(ctx, (), (cfg, testsetname), jobgroup=grp))
+    if cfg.meta.run_tests:
+        for testsetname in cfg.testsets._children_keys():
+            jd['testsets'][testsetname].append(jobs.TestsetJob(ctx, (), (cfg, testsetname), jobgroup=grp))
 
-    for testname in cfg.tests._children_keys():
-        for ex_job in jd['explorations']:
-            jd['tests'][testname].append(jobs.TestJob(ctx, (), (cfg, ex_job, testname), jobgroup=grp))
+        for testname in cfg.tests._children_keys():
+            for ex_job in jd['explorations']:
+                jd['tests'][testname].append(jobs.TestJob(ctx, (), (cfg, ex_job, testname), jobgroup=grp))
 
-        jd['results'][testname].append(jobs.ResultJob(ctx, (), (cfg, testname), jobgroup=grp))
+            jd['results'][testname].append(jobs.ResultJob(ctx, (), (cfg, testname), jobgroup=grp))
 
     return jd
 
