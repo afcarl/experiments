@@ -53,8 +53,6 @@ def populate_grp(cfg, grp=None):
     if grp == None:
         grp = jobgroup.JobBatch(context.Env(user=cfg.meta.user))
 
-
-
     jd = {'setup': [],
           'explorations': [],
           'testsets': {testset_name:[] for testset_name in cfg.testsets._children_keys()},
