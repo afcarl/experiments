@@ -43,6 +43,7 @@ def grp_cmdline(grp, script_name='run.sh', rep_modulo=(1, 0)):
     if args.run:
         cmds = grp.run_commands(job_names=job_torun)
         for cmd in cmds:
+            print(cmd)
             subprocess.call(cmd, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr, shell=True)
 
 
