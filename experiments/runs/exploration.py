@@ -61,6 +61,7 @@ def load_src_files(cfg, env_m_channels):
 
 def gather_provenance(cfg, env, check_dirty=True):
     prov_cfg = scicfg.SciConfig()
+    prov_cfg.check_dirty = cfg.provenance.check_dirty
     prov_cfg.packages = provenance.packages_info(cfg.provenance.package_names)
     prov_cfg.platform = provenance.platform_info()
     prov_cfg.env      = env.info()

@@ -49,20 +49,21 @@ def packages_info(package_names):
 
     return cfg
 
-def check_dirty(provenance_cfg):
-    dirty_pkgs = []
-    for pkg_name, cfg in provenance_cfg.packages._branches:
-        try:
+def check_dirty(provenance_cfg, force=False):
+    if force or provenance_cfg.check_dirty:
+        dirty_pkgs = []
+        for pkg_name, cfg in provenance_cfg.packages._branches:
+            try:
+                if cfg.dirty:
+                    dirty_pkgs.append(pkg_name)
+            except KeyError:
+                pass
+        for code_name, cfg in provenance_cfg.code._branches:
             if cfg.dirty:
-                dirty_pkgs.append(pkg_name)
-        except KeyError:
-            pass
-    for code_name, cfg in provenance_cfg.code._branches:
-        if cfg.dirty:
-            dirty_pkgs.append(code_name)
+                dirty_pkgs.append(code_name)
 
-    if len(dirty_pkgs) > 0:
-        raise ValueError("the following packages have dirty gits: {}. Won't proceed.".format(dirty_pkgs))
+        if len(dirty_pkgs) > 0:
+            raise ValueError("the following packages have dirty gits: {}. Won't proceed.".format(dirty_pkgs))
 
 def git_commit(working_dir):
     """Return the SHA1 of the current commit"""
