@@ -143,7 +143,7 @@ def explore(cfg):
             history.add_entry(t, entry)
             if autosave.autosave():
                 # save history at regular intervals
-                history['random_state'] = random.getstate()
+                history.meta['random_state'] = random.getstate()
                 history.save()
 
 
