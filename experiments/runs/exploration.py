@@ -141,10 +141,12 @@ def explore(cfg):
         for t in range(len(history), cfg.exploration.steps):
             entry = exploration_step(env, explorer)
             history.add_entry(t, entry)
+            print('step {} done'.format(t))
             if autosave.autosave():
                 # save history at regular intervals
                 history.meta['random_state'] = random.getstate()
                 history.save()
+                print('autosaving...')
 
 
             ## Finishing ##
