@@ -45,8 +45,8 @@ desc._describe('provenance.package_names', instanceof=collections.Iterable, defa
 desc._branch('provenance.code', strict=False)
 desc._describe('provenance.check_dirty', instanceof=bool, default=True,
                docstring='Check if git repository are dirty')
-# desc._describe('provenance.check_continuity', instanceof=bool, default=True,
-#                docstring='Check if the git commit change between executions of a same job')
+desc._describe('provenance.check_continuity', instanceof=bool, default=True,
+               docstring='Check if the provenance info (commits, platform, etc.) changes between executions of a same job')
 
 
     # Qsub #
