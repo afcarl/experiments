@@ -1,7 +1,7 @@
 import os
 
 from environments import tools
-from clusterjobs import context
+from clusterjobs import context, jobgroup
 
 from ..tools import chrono
 from .. import jobs
@@ -31,13 +31,12 @@ class Data(object):
 
 class DataResults(Data):
 
-    def __init__(self, expcfg, testname='', verbose=True, load=True):
+    def __init__(self, expcfg, testname='', jobgrp=None, verbose=True, load=True):
         self.expcfg   = expcfg
         self.testname = testname
         self.verbose  = verbose
 
-        ctx = context.Context(expcfg.meta.rootpath, expcfg.exp.path)
-        job_dict = populate_grp(expcfg)
+        job_dict = populate_grp(expcfg, grp=jobgrp)
         self.job = job_dict['results'][testname][0]
 
         self.rep = self.job.jobcfg.rep
@@ -68,13 +67,12 @@ class DataResults(Data):
 
 class DataExploration(Data):
 
-    def __init__(self, expcfg, rep, verbose=True, load=True):
+    def __init__(self, expcfg, rep, jobgrp=None, verbose=True, load=True):
         self.expcfg  = expcfg
         self.verbose = verbose
         self.rep     = rep
 
-        ctx = context.Context(expcfg.meta.rootpath, expcfg.exp.path)
-        job_dict = populate_grp(expcfg)
+        job_dict = populate_grp(expcfg, grp=jobgrp)
         self.job = job_dict['explorations'][rep]
 
         self.key = self.job.jobcfg.key
@@ -137,16 +135,20 @@ def load_result(expcfg, testname, verbose=True):
     return DataResults(expcfg, testname, verbose=verbose)
 
 def load_results(expcfgs_grid, testname, mask=None, verbose=True):
+    jobgrp = jobgroup.JobBatch(context.Env(user=None)) # FIXME: simplify
+
     g = []
     for expcfgs_row in expcfgs_grid:
         g.append([])
         if mask is None:
             mask = [True for _ in expcfgs_row]
         for flag, expcfg in zip(mask, expcfgs_row):
-            if not flag or expcfg is None:
+            if not flag:
+                if expcfg is not None:
+                    populate_grp(expcfg, grp=jobgrp)
                 g[-1].append(None)
             else:
-                g[-1].append(load_result(expcfg, testname, verbose=verbose))
+                g[-1].append(DataResults(expcfg, testname, jobgrp=jobgrp, verbose=verbose))
 
     return g
 
