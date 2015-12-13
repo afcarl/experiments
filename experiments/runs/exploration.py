@@ -72,9 +72,9 @@ def gather_provenance(cfg, env, check_dirty=True):
     return prov_cfg
 
 def check_provenance(cfg, prov_cfg):
-    assert cfg.provenance.packages == prof_cfg.packages
-    assert cfg.platform.python     == prof_cfg.python
-    assert cfg.env                 == prof_cfg.env
+    assert cfg.provenance.packages == prov_cfg.packages
+    assert cfg.platform.python     == prov_cfg.python
+    assert cfg.env                 == prov_cfg.env
 
 def explore(cfg):
     cfg_orig = cfg._deepcopy()
