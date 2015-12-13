@@ -38,10 +38,9 @@ def load_existing_datafile(cfg, core_keys):
                                        extralog=cfg.hardware.logs,
                                        verbose=True)
         # compare config.run with config
-        assert history.meta['jobcfg.pristine'] == cfg
-        # load config.track & tracking checks
-        #tracking.check(history.meta['cfg.track'])
-        return history
+        if history.meta['jobcfg.pristine'] == cfg: # if not the same, restart from scratch
+            return history
+
 
 def load_src_files(cfg, env_m_channels):
     """Load datafile from the source tasks and create corresponding datasets"""
@@ -115,8 +114,12 @@ def explore(cfg):
         prov_cfg = gather_provenance(cfg, env, check_dirty=True)
 
         if history is not None:
-            check_provenance(cfg, prov_cfg)
-        else:
+            try:
+                check_provenance(cfg, prov_cfg)
+            except AssertionError: # provenance changed: restarting from scratch
+                history = None
+
+        if history is None:
             cfg.provenance._update(prov_cfg, overwrite=True)
 
             history = chrono.ChronoHistory(cfg.hardware.datafile, cfg.hardware.logfile,
