@@ -74,7 +74,7 @@ def gather_provenance(cfg, env):
 def check_provenance(cfg, prov_cfg):
     if cfg.provenance.check_continuity:
         assert cfg.provenance.packages        == prov_cfg.packages
-        assert cfg.provenance.platform.python == prov_cfg.python
+        assert cfg.provenance.platform.python == prov_cfg.platform.python
         assert cfg.provenance.env             == prov_cfg.env
 
 def explore(cfg):
