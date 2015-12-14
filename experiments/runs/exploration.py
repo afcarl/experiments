@@ -58,7 +58,7 @@ def load_src_files(cfg, env_m_channels):
 
     return src_datasets
 
-def gather_provenance(cfg, env, check_dirty=True):
+def gather_provenance(cfg, env):
     prov_cfg = scicfg.SciConfig()
     prov_cfg.check_dirty = cfg.provenance.check_dirty
     prov_cfg.packages = provenance.packages_info(cfg.provenance.package_names)
@@ -66,7 +66,7 @@ def gather_provenance(cfg, env, check_dirty=True):
     prov_cfg.env      = env.info()
     prov_cfg.code     = cfg.provenance._get('code', scicfg.SciConfig())
 
-    if check_dirty:
+    if cfg.provenance.check_dirty:
         provenance.check_dirty(prov_cfg)
 
     return prov_cfg
@@ -112,7 +112,7 @@ def explore(cfg):
 
             ## Running learning ##
 
-        prov_cfg = gather_provenance(cfg, env, check_dirty=True)
+        prov_cfg = gather_provenance(cfg, env)
 
         if history is not None:
             try:
