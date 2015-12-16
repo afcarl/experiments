@@ -5,7 +5,8 @@ from .runs.main import run_job
 from .jobs.tests import testcov_cfg, testnn_cfg, testinv_cfg
 from .jobs.keys import expkey
 
-from .data.data import DataResults, DataExploration, DataSensoryExploration, load_explorations, load_results
+from .data.data import DataResults, DataExploration, DataSensoryExploration
+from .data.data import load_explorations, load_results, load_exploration, load_result
 
 
 from ._version import get_versions

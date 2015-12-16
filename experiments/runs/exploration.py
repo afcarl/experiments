@@ -30,6 +30,16 @@ def exploration_step(env, explorer, tries=3):
     explorer.receive(exploration, feedback)
     return {'exploration': exploration, 'feedback': feedback, 'meta': meta}
 
+def same_cfg(cfg_a, cfg_b):
+    try:
+        for key_a, v_a in cfg_a._items():
+            assert cfg_b[key_a] == v_a
+        for key_b, v_b in cfg_b._items():
+            assert cfg_a[key_b] == v_b
+        return True
+    except (KeyError, AssertionError) as e:
+        return False
+
 def load_existing_datafile(cfg, core_keys):
     """Load existing datafile and checks, if it exists."""
     if datafile.isfile(cfg.hardware.datafile):
@@ -38,8 +48,11 @@ def load_existing_datafile(cfg, core_keys):
                                        extralog=cfg.hardware.logs,
                                        verbose=True)
         # compare config.run with config
-        if history.meta['jobcfg.pristine'] == cfg: # if not the same, restart from scratch
-            return history
+        if not same_cfg(history.meta['jobcfg.pristine'], cfg): # if not the same, restart from scratch
+            print("configuration file does not match recorded configuration, restarting...")
+            return None
+
+        return history
 
 
 def load_src_files(cfg, env_m_channels):
@@ -58,24 +71,19 @@ def load_src_files(cfg, env_m_channels):
 
     return src_datasets
 
-def gather_provenance(cfg, env):
-    prov_cfg = scicfg.SciConfig()
-    prov_cfg.check_dirty = cfg.provenance.check_dirty
-    prov_cfg.packages = provenance.packages_info(cfg.provenance.package_names)
-    prov_cfg.platform = provenance.platform_info()
-    prov_cfg.env      = env.info()
-    prov_cfg.code     = cfg.provenance._get('code', scicfg.SciConfig())
+def filter_entry(cfg, entry):
+    """Filter meta info for inclusion in data files"""
+    f_entry = {'exploration': entry['exploration'], 'feedback': entry['feedback'], 'meta': {}}
+    for key in cfg.hardware.metadata:
+        try:
+            v = entry['meta']
+            for k in key:
+                v = v[k]
+            f_entry['meta']['.'.join(key)] = v
+        except KeyError:
+            pass
+    return f_entry
 
-    if cfg.provenance.check_dirty:
-        provenance.check_dirty(prov_cfg)
-
-    return prov_cfg
-
-def check_provenance(cfg, prov_cfg):
-    if cfg.provenance.check_continuity:
-        assert cfg.provenance.packages        == prov_cfg.packages
-        assert cfg.provenance.platform.python == prov_cfg.platform.python
-        assert cfg.provenance.env             == prov_cfg.env
 
 def explore(cfg):
     cfg_orig = cfg._deepcopy()
@@ -112,12 +120,13 @@ def explore(cfg):
 
             ## Running learning ##
 
-        prov_cfg = gather_provenance(cfg, env)
+        prov_cfg = provenance.gather_provenance(cfg, env)
 
         if history is not None:
             try:
-                check_provenance(cfg, prov_cfg)
+                provenance.check_provenance(cfg, prov_cfg)
             except AssertionError: # provenance changed: restarting from scratch
+                print("continuity broken, restarting...")
                 history = None
 
         if history is None:
@@ -129,28 +138,28 @@ def explore(cfg):
                                                  'm_channels': env.m_channels,
                                                  's_channels': env.s_channels,
                                                  'random_state': random.getstate()},
-                                           core_keys=('exploration', 'feedback'),
+                                           core_keys=('exploration', 'feedback', 'meta'),
                                            extralog=cfg.hardware.logs,
                                            verbose=True, load=False)
-
-        # setting random state
-        random.setstate(history.meta['random_state'])
 
         # replaying history
         for entry in history:
             explorer.receive(entry['data']['exploration'], entry['data']['feedback'])
 
+        # setting random state
+        random.setstate(history.meta['random_state'])
 
         # running exploration; the next three lines are the core of the experiment.
         for t in range(len(history), cfg.exploration.steps):
             entry = exploration_step(env, explorer)
+            entry = filter_entry(cfg, entry)
             history.add_entry(t, entry)
             print('step {} done'.format(t))
             if autosave.autosave():
                 # save history at regular intervals
                 history.meta['random_state'] = random.getstate()
                 history.save()
-                print('autosaving...')
+                print('autosaved...')
 
 
             ## Finishing ##

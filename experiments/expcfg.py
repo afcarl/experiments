@@ -107,6 +107,7 @@ desc._describe('exp.deps', instanceof=collections.Iterable, default=(),
 hardware_cfg = scicfg.SciConfig(strict=True)
 hardware_cfg._describe('configfile',  instanceof=str, docstring='configuration file for exploration')
 hardware_cfg._describe('datafile',    instanceof=str, docstring='configuration file for exploration')
+hardware_cfg._describe('metadata',    instanceof=collections.Iterable, docstring='metadata keys to include in datafile', default=())
 hardware_cfg._describe('seed',        instanceof=numbers.Integral, docstring='random seed for repeatable experiments')
 hardware_cfg._describe('logfile',     instanceof=str, docstring='the log file filepath')
 hardware_cfg._describe('logs',        instanceof=bool, default=False, docstring='generate additional logs of the motor execution')
@@ -119,6 +120,7 @@ desc._branch('exploration.explorer', strict=False)
 desc._branch('exploration.env', strict=False)
 desc._describe('exploration.steps', instanceof=numbers.Integral, docstring='the number of trials')
 desc._describe('exploration.seeds', instanceof=collections.Iterable, docstring='random seeds')
+desc._describe('exploration.metadata', instanceof=collections.Iterable, docstring='see hardware.metadata')
 
 
     # Testsets Configs #

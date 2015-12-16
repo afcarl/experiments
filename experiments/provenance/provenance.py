@@ -74,3 +74,22 @@ def git_dirty(working_dir):
     """Return True if dirty"""
     repo = git.Repo(working_dir)
     return repo.is_dirty()
+
+def gather_provenance(cfg, env):
+    prov_cfg = scicfg.SciConfig()
+    prov_cfg.check_dirty = cfg.provenance.check_dirty
+    prov_cfg.packages = packages_info(cfg.provenance.package_names)
+    prov_cfg.platform = platform_info()
+    prov_cfg.env      = env.info()
+    prov_cfg.code     = cfg.provenance._get('code', scicfg.SciConfig())
+
+    if cfg.provenance.check_dirty:
+        provenance.check_dirty(prov_cfg)
+
+    return prov_cfg
+
+def check_provenance(cfg, prov_cfg):
+    if cfg.provenance.check_continuity:
+        assert cfg.provenance.packages        == prov_cfg.packages
+        assert cfg.provenance.platform.python == prov_cfg.platform.python
+        assert cfg.provenance.env             == prov_cfg.env

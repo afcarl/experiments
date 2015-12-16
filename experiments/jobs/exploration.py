@@ -52,6 +52,7 @@ class ExplorationJob(basejobs.ConfigJob):
         self.jobcfg.hardware.sensoryfile = self.jobkey.filepath + '.ds'
         self.jobcfg.hardware.logfile     = self.jobkey.filepath + '.log'
         self.jobcfg.hardware.seed        = expcfg.exploration.seeds[rep]
+        self.jobcfg.hardware.metadata    = expcfg.exploration.metadata
 
     def prepare(self, args):
         expcfg, rep = args

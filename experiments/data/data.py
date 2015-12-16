@@ -87,7 +87,7 @@ class DataExploration(Data):
 
         self.data = {'ticks': [], 'explorations': [], 'observations': [],
                      's_signals': [], 's_vectors': [], 's_goals': [],
-                     'm_signals': [], 'm_vectors': [],
+                     'm_signals': [], 'm_vectors': [], 'metadata': [],
                      's_channels': self.s_channels, 'm_channels': self.m_channels}
 
         for t, entry in enumerate(history.core.entries):
@@ -103,6 +103,7 @@ class DataExploration(Data):
                 self.data['s_signals'].append(s_signal)
                 self.data['m_vectors'].append(tools.to_vector(m_signal, self.m_channels))
                 self.data['s_vectors'].append(tools.to_vector(s_signal, self.s_channels))
+                self.data['metadata'].append(entry['data']['meta'])
 
 
 class DataSensoryExploration(DataExploration):
