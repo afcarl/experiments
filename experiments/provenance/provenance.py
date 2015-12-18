@@ -84,7 +84,7 @@ def gather_provenance(cfg, env):
     prov_cfg.code     = cfg.provenance._get('code', scicfg.SciConfig())
 
     if cfg.provenance.check_dirty:
-        provenance.check_dirty(prov_cfg)
+        check_dirty(prov_cfg)
 
     return prov_cfg
 
