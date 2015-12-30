@@ -16,6 +16,9 @@ cfg.meta.run_exploration=True
 cfg.provenance.package_names = ('experiments', 'clusterjobs', 'scicfg',
                                 'learners', 'explorers', 'environments',
                                 'scipy', 'numpy')
+cfg.provenance.check_dirty      = False
+cfg.provenance.check_continuity = True
+
 
 cfg.exp.path = 'unit_tests/'
 cfg.exp.prefix   = ('prefix',)
@@ -28,6 +31,8 @@ cfg.exploration.explorer = explorers.RandomMotorExplorer.defcfg._deepcopy()
 cfg.exploration.env_name = 'kin7_150'
 cfg.exploration.env      = environments.envs.KinematicArm2D.defcfg._deepcopy()
 cfg.exploration.deps     = ()
+cfg.exploration.metadata = ([],)
+
 
 cfg.testsets = scicfg.SciConfig()
 cfg.testsets['blabla.algorithm'] = 'fromfile'
@@ -68,11 +73,11 @@ def reuse_ex(mb, p_reuse, algorithm='sensor_uniform', res=20, lrn_name='p0.05'):
 
 
 tgt_cfg = cfg._deepcopy()
-tgt_cfg.exp.path = 'unit_tests2/'
+tgt_cfg.exp.path = 'unit_tests/'
 
 tgt_cfg.exploration.ex_name, tgt_cfg.exploration.explorer = reuse_ex(50, 0.5)
 tgt_cfg.exploration.deps = (experiments.expkey(cfg),)
-tgt_cfg.exp.prefix   = ('prefix', 'random.motor', 'kin7_150')
+tgt_cfg.exp.prefix   = ('prefix2',) #, 'random.motor', 'kin7_150')
 
 
 if __name__ == '__main__':

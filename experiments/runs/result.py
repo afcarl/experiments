@@ -2,9 +2,9 @@ from __future__ import absolute_import, division, print_function
 
 import numpy as np
 
-import toolbox
 import explorers
 
+from .. import tools
 from ..tools import chrono
 
 
@@ -47,7 +47,7 @@ def compile_results(cfg):
                     for s_goal, feedback in zip(entry['data']['testset']['s_goals'], entry['data']['tests']):
                         s_v_test   = explorers.tools.to_vector(s_goal, s_channels)
                         s_v_actual = explorers.tools.to_vector(feedback['s_signal'], s_channels)
-                        errors.append(toolbox.dist(s_v_test, s_v_actual))
+                        errors.append(tools.dist(s_v_test, s_v_actual))
 
                 print(len(results.core.entries[tick]['data']['error_avgs']), i)
                 assert len(results.core.entries[tick]['data']['error_avgs']) == i

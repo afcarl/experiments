@@ -27,8 +27,8 @@ def platform_info():
 
 
 pkg_desc = scicfg.SciConfig(strict=True)
-pkg_desc._describe('version', instanceof=(str, unicode))
-pkg_desc._describe('commit', instanceof=(str, unicode))
+pkg_desc._describe('version', instanceof=scicfg.string)
+pkg_desc._describe('commit', instanceof=scicfg.string)
 pkg_desc._describe('dirty', instanceof=bool)
 
 def packages_info(package_names):

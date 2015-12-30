@@ -66,7 +66,7 @@ class ExplorationJob(basejobs.ConfigJob):
         self._finalize()
 
         self.jobcfg.hardware.src_files = []
-        for expkeydep in expcfg.exp.deps:
+        for expkeydep in expcfg.exploration.deps:
             jobkeydep = JobKey(('exploration',), expkeydep, self.jobcfg.rep)
             jobdep = self.jobgroup.jobs_byname[jobkeydep.name]
             rel_path = os.path.relpath(jobdep.context.fullpath(''), self.context.fullpath(''))

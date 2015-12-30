@@ -4,7 +4,6 @@ import shapely
 import shapely.ops
 import shapely.geometry
 
-import toolbox
 import learners
 from learners import tools
 

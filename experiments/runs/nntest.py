@@ -1,9 +1,9 @@
 from __future__ import print_function, division, absolute_import
 
-import toolbox
 import learners
 from learners import tools
 
+from .. import tools
 from ..tools import chrono
 
 
@@ -13,7 +13,7 @@ def measure_perf(tick, testset, nnset, data_cfg, history, light=False):
         s_vector_goal = tools.to_vector(s_goal, testset['s_channels'])
         dist, idx = nnset.nn_y(s_vector_goal, k=1)
         s_vector = nnset.ys[idx[0]]
-        errors.append(toolbox.dist(s_vector_goal, s_vector))
+        errors.append(tools.dist(s_vector_goal, s_vector))
 
     print('log: test(t={}) done'.format(tick))
 
