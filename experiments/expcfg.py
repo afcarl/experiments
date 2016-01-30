@@ -120,7 +120,7 @@ desc._branch('exploration.explorer', strict=False)
 desc._branch('exploration.env', strict=False)
 desc._describe('exploration.steps', instanceof=numbers.Integral, docstring='the number of trials')
 desc._describe('exploration.seeds', instanceof=collections.Iterable, docstring='random seeds')
-desc._describe('exploration.metadata', instanceof=collections.Iterable, docstring='see hardware.metadata')
+desc._describe('exploration.metadata', instanceof=collections.Iterable, docstring='see hardware.metadata', default=())
 
 
     # Testsets Configs #
