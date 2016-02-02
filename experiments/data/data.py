@@ -126,17 +126,18 @@ class DataSensoryExploration(DataExploration):
                 self.data['s_vectors'].append(tools.to_vector(s_signal, self.s_channels))
 
 
-def load_exploration(expcfg, rep=0, sensory=False, verbose=True):
+def load_exploration(expcfg, rep=0, sensory=False, jobgrp=None, verbose=True):
     if sensory:
-        return DataSensoryExploration(expcfg, rep, verbose=verbose)
+        return DataSensoryExploration(expcfg, rep, jobgrp=jobgrp, verbose=verbose)
     else:
-        return DataExploration(expcfg, rep, verbose=verbose)
+        return DataExploration(expcfg, rep, jobgrp=jobgrp, verbose=verbose)
 
 def load_result(expcfg, testname, verbose=True):
     return DataResults(expcfg, testname, verbose=verbose)
 
-def load_results(expcfgs_grid, testname, mask=None, verbose=True):
-    jobgrp = jobgroup.JobBatch(context.Env(user=None)) # FIXME: simplify
+def load_results(expcfgs_grid, testname, mask=None, jobgrp=None, verbose=True):
+    if jobgrp is None:
+        jobgrp = jobgroup.JobBatch(context.Env(user=None)) # FIXME: simplify
 
     g = []
     for expcfgs_row in expcfgs_grid:
@@ -154,9 +155,12 @@ def load_results(expcfgs_grid, testname, mask=None, verbose=True):
     return g
 
 def load_explorations(expcfgs_grid, rep=0, sensory=False, verbose=True):
+    jobgrp = jobgroup.JobBatch(context.Env(user=None)) # FIXME: simplify
+
     g = []
     for expcfgs_row in expcfgs_grid:
         g.append([])
         for expcfg in expcfgs_row:
-            g[-1].append(load_exploration(expcfg, rep=rep, sensory=sensory, verbose=verbose))
+            g[-1].append(load_exploration(expcfg, rep=rep, sensory=sensory,
+                                          jobgrp=jobgrp, verbose=verbose))
     return g
