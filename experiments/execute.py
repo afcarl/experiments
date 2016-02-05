@@ -1,10 +1,13 @@
-import os, sys, stat
+import sys
+import collections
 import argparse
 import subprocess
 
-from clusterjobs import qstat
+import scicfg
+from clusterjobs import qstat, context, jobgroup
 
 from . import jobs
+
 
 def parser():
     p = argparse.ArgumentParser(description='configure jobs for experiments')
@@ -18,6 +21,7 @@ def parser():
     p.add_argument('-r', dest='result_only', default=False, action='store_true', help='compute only results')
     p.add_argument('--run', dest='run',  default=False, action='store_true', help='launch the necessary commands from python')
     return p.parse_args()
+
 
 def grp_cmdline(grp, script_name='run.sh', rep_modulo=(1, 0)):
     args = parser()
@@ -46,8 +50,6 @@ def grp_cmdline(grp, script_name='run.sh', rep_modulo=(1, 0)):
             print(cmd)
             subprocess.call(cmd, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr, shell=True)
 
-
-from clusterjobs import context, jobgroup
 
 def populate_grp(cfg, grp=None):
     ctx = context.Context(cfg.meta.rootpath, cfg.exp.path)
@@ -79,7 +81,27 @@ def populate_grp(cfg, grp=None):
 
     return jd
 
+
+def dict_exps(exps, exp_cfgs=None):
+    if exp_cfgs is None:
+        exp_cfgs = collections.OrderedDict()
+    if isinstance(exps, scicfg.SciConfig):
+        exp_cfgs[experiments.expkey(exp_cfg)] = exp_cfg
+    else:
+        for exp in exps:
+            if isinstance(exp, scicfg.SciConfig):
+                exp_cfgs[jobs.keys.expkey(exp)] = exp
+            else:
+                dict_exps(exp, exp_cfgs=exp_cfgs)
+    return exp_cfgs
+
+
+def flatten_exps(exp_cfgs):
+    return list(dict_exps(exp_cfgs).values())
+
+
 def run_exps(cfgs):
+    cfgs = flatten_exps(cfgs)
     grp = jobgroup.JobBatch(context.Env(user=cfgs[0].meta.user))
 
     for cfg in cfgs:
