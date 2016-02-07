@@ -91,7 +91,7 @@ def explore(cfg):
 
     try:
             ## Load potentially existing data ##
-        history = load_existing_datafile(cfg, core_keys=('exploration', 'feedback'))
+        history = load_existing_datafile(cfg, core_keys=('exploration', 'feedback', 'meta'))
         if history is None:
             # set a random seed if none already set.
             cfg.hardware._setdefault('seed', random.randint(0, 9223372036854775807)) # sys.maxint

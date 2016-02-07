@@ -107,7 +107,7 @@ class DataExploration(Data):
                     self.data['metadata'].append(entry['data']['meta'])
                 except KeyError:
                     self.data['metadata'].append({})
-                    print('Warning: entry {} does not have metadata'.format(entry['t']))
+                    #print('Warning: entry {} does not have metadata'.format(entry['t']))
 
 
 class DataSensoryExploration(DataExploration):
