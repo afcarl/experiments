@@ -5,7 +5,7 @@ from clusterjobs import context, jobgroup
 
 from ..tools import chrono
 from .. import jobs
-from ..execute import populate_grp
+from ..execute import populate_grp, flatten_exps
 
 _already_loaded = {}
 
@@ -103,7 +103,11 @@ class DataExploration(Data):
                 self.data['s_signals'].append(s_signal)
                 self.data['m_vectors'].append(tools.to_vector(m_signal, self.m_channels))
                 self.data['s_vectors'].append(tools.to_vector(s_signal, self.s_channels))
-                self.data['metadata'].append(entry['data']['meta'])
+                try:
+                    self.data['metadata'].append(entry['data']['meta'])
+                except KeyError:
+                    self.data['metadata'].append({})
+                    print('Warning: entry {} does not have metadata'.format(entry['t']))
 
 
 class DataSensoryExploration(DataExploration):
@@ -126,7 +130,12 @@ class DataSensoryExploration(DataExploration):
                 self.data['s_vectors'].append(tools.to_vector(s_signal, self.s_channels))
 
 
-def load_exploration(expcfg, rep=0, sensory=False, jobgrp=None, verbose=True):
+def load_exploration(expcfg, rep=0, exp_cfgs=(), sensory=False, jobgrp=None, verbose=True):
+    if jobgrp is None:
+        jobgrp = jobgroup.JobBatch(context.Env(user=None))
+    for cfg in flatten_exps(exp_cfgs):
+        populate_grp(cfg, jobgrp)
+
     if sensory:
         return DataSensoryExploration(expcfg, rep, jobgrp=jobgrp, verbose=verbose)
     else:

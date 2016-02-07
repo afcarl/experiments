@@ -176,6 +176,7 @@ def explore(cfg):
             feedback_history.add_entry(t, {'s_signal': feedback['s_signal'], 'from': exploration['from']})
         feedback_history.save()
 
+        history.meta['random_state'] = random.getstate()
         history.save(verbose=True, done=True)
         datafile.save_config(cfg, filename=cfg.hardware.configfile+'.done', directory='')
 
