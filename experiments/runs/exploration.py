@@ -120,17 +120,22 @@ def explore(cfg):
 
             ## Running learning ##
 
-        prov_cfg = provenance.gather_provenance(cfg, env)
+        prov_data = provenance.ProvenanceData.from_desc(cfg.provenance.desc, env)
+        if cfg.provenance.check_dirty:
+            prov_data.check_dirty()
 
         if history is not None:
             try:
-                provenance.check_provenance(cfg, prov_cfg)
+                if cfg.provenance.check_continuity:
+                    print('provenance continuity verified; proceeding from last checkpoint.')
+                    assert prov_data.same_cfg(cfg.provenance.data)
             except AssertionError: # provenance changed: restarting from scratch
                 print("continuity broken, restarting...")
                 history = None
 
         if history is None:
-            cfg.provenance._update(prov_cfg, overwrite=True)
+
+            cfg.provenance['data'] = prov_data.cfg()
 
             history = chrono.ChronoHistory(cfg.hardware.datafile, cfg.hardware.logfile,
                                            meta={'jobcfg.pristine': cfg_orig,
@@ -155,7 +160,7 @@ def explore(cfg):
             entry = filter_entry(cfg, entry)
             history.add_entry(t, entry)
             print('step {} done'.format(t))
-            if autosave.autosave():
+            if autosave.autosave(cfg.hardware.autosave_period):
                 # save history at regular intervals
                 history.meta['random_state'] = random.getstate()
                 history.save()

@@ -40,9 +40,8 @@ desc._describe('meta.run_coverage', instanceof=bool, default=True,
 
     # Provenance #
 
-desc._describe('provenance.package_names', instanceof=collections.Iterable, default=(),
-               docstring='python packages involved in the experiment (for tracking)')
-desc._branch('provenance.code', strict=False)
+desc._branch('provenance.desc', strict=False)
+desc._branch('provenance.data', strict=False)
 desc._describe('provenance.check_dirty', instanceof=bool, default=True,
                docstring='Check if git repository are dirty')
 desc._describe('provenance.check_continuity', instanceof=bool, default=True,
@@ -111,7 +110,7 @@ hardware_cfg._describe('metadata',    instanceof=collections.Iterable, docstring
 hardware_cfg._describe('seed',        instanceof=numbers.Integral, docstring='random seed for repeatable experiments')
 hardware_cfg._describe('logfile',     instanceof=str, docstring='the log file filepath')
 hardware_cfg._describe('logs',        instanceof=bool, default=False, docstring='generate additional logs of the motor execution')
-hardware_cfg._describe('autosave_period', instanceof=numbers.Integral, default=300, docstring='save data at regular intervals')
+hardware_cfg._describe('autosave_period', instanceof=numbers.Integral, default=10, docstring='save data at regular intervals')
 
 
     # Exploration Config #
