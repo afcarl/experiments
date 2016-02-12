@@ -27,6 +27,10 @@ testnn_cfg._describe('testset', instanceof=str, docstring='name of the testset')
 
 testcov_cfg = testkind_cfg._deepcopy()
 testcov_cfg._describe('buffer_size', instanceof=numbers.Real)
+testcov_cfg._describe('depolarize', instanceof=bool, default=True,
+                      docstring=('if True, will transfor polar coordinate in s_signal'
+                                 'into euclidean ones before computing coverage'))
+
 
 job_desc_cfgs = {'cov': testcov_cfg,
                  'nn':   testnn_cfg,
