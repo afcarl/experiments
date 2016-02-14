@@ -26,7 +26,7 @@ class Data(object):
             self.data = _already_loaded[self.key]
         else:
             self._load()
-            _already_loaded[self.key] = self.data
+            #_already_loaded[self.key] = self.data
         return self.data
 
 class DataResults(Data):
@@ -78,17 +78,22 @@ class DataExploration(Data):
         self.key = self.job.jobcfg.key
         if load:
             self.load()
+            self.meta       = self.data['meta']
+            self.m_channels = self.data['m_channels']
+            self.s_channels = self.data['s_channels']
 
     def _load(self):
         history = self.load_history()
 
+        self.meta = history.core.meta
         self.m_channels = history.core.meta['m_channels']
         self.s_channels = history.core.meta['s_channels']
 
         self.data = {'ticks': [], 'explorations': [], 'observations': [],
                      's_signals': [], 's_vectors': [], 's_goals': [],
                      'm_signals': [], 'm_vectors': [], 'metadata': [],
-                     's_channels': self.s_channels, 'm_channels': self.m_channels}
+                     's_channels': self.s_channels, 'm_channels': self.m_channels,
+                     'meta': self.meta}
 
         for t, entry in enumerate(history.core.entries):
             if entry is not None:
@@ -173,3 +178,6 @@ def load_explorations(expcfgs_grid, rep=0, sensory=False, verbose=True):
             g[-1].append(load_exploration(expcfg, rep=rep, sensory=sensory,
                                           jobgrp=jobgrp, verbose=verbose))
     return g
+
+def free_data():
+    _already_loaded.clear()

@@ -86,7 +86,7 @@ def dict_exps(exps, exp_cfgs=None):
     if exp_cfgs is None:
         exp_cfgs = collections.OrderedDict()
     if isinstance(exps, scicfg.SciConfig):
-        exp_cfgs[experiments.expkey(exp_cfg)] = exp_cfg
+        exp_cfgs[experiments.expkey(exps)] = exps
     else:
         for exp in exps:
             if isinstance(exp, scicfg.SciConfig):

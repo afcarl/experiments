@@ -17,4 +17,4 @@ from .jobs.tests import testcov_cfg, testnn_cfg, testinv_cfg
 from .jobs.keys import expkey
 
 from .data.data import DataResults, DataExploration, DataSensoryExploration
-from .data.data import load_explorations, load_results, load_exploration, load_result
+from .data.data import load_explorations, load_results, load_exploration, load_result, free_data

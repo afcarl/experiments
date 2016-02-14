@@ -28,6 +28,23 @@ class PkgInfo(object):
         self.dirty   = dirty
         self.link    = link
 
+    @classmethod
+    def from_cfg(cls, pkg_cfg):
+        return cls(pkg_cfg.name,
+                   version=pkg_cfg._get('version', None),
+                   commit=pkg_cfg._get('commit', None),
+                   dirty=pkg_cfg._get('dirty', None),
+                   link=pkg_cfg._get('link', None))
+
+    def __key(self):
+        return (self.name, self.version, self.commit, self.dirty, self.link)
+
+    def __eq__(x, y):
+        return x.__key() == y.__key()
+
+    def __hash__(self):
+        return hash(self.__key())
+
     def cfg(self):
         # pkg = importlib.import_module(self.name) # we don't catch the exceptions by design
         pkg_cfg = pkg_desc._deepcopy()
@@ -255,13 +272,15 @@ class ProvenanceData(object):
         # code text
         code_name, code_dir, code_commit, code_dirty = self._code
         if not self.dirty:
-            s += ('All the code involved in the computation is commited '
+            s += ('All the code involved in the execution of this notebook is commited '
                   '(no git repository in dirty state).\n')
         else:
             s += ('Some code involved in the computation has not been commited.\n'
                   'The following repository are in dirty state: {}.\n'.format(
                   ', '.join([name for name in self.dirty_pkgs])))
-        s += 'This code was executed with commit {}{}.\n\n'.format(
+            s += '\n'
+
+        s += 'This notebook was executed with commit {}{}.\n\n'.format(
              code_commit, ' (dirty)' if code_dirty else '')
 
         # research package text
@@ -366,3 +385,136 @@ class ProvenanceData(object):
         check = check and this_cfg.platform.python == other_cfg.platform.python
         check = check and this_cfg._get('env_info', None) == other_cfg._get('env_info', None)
         return check
+
+
+class ProvenanceAccumulator(object):
+
+    def __init__(self, code_dir=None):
+        self._current_commit = None
+        self._current_dirty  = None
+        if code_dir is not None:
+            self.register_code(code_dir)
+
+        self._code = set()
+        self._research_pkgs = {}
+        self._thirdparty_py = {}
+        self._thirdparty    = {}
+        self._pythons       = set()
+
+        self.dirty_pkgs = set()
+
+    def __key(self):
+        return (self._code, self._research_pkgs, self._thirdparty_py,
+                self._thirdparty_py, self.dirty_pkgs)
+
+    def __eq__(x, y):
+        return x.__key() == y.__key()
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def register_code(self, code_dir):
+        assert os.path.isdir(code_dir)
+        self._current_commit = git_commit(code_dir)
+        self._current_dirty  = git_dirty(code_dir)
+
+    def tracks(self):
+        n = 0
+        n = max(n, len(self._code))
+        n = max(n, max(len(pkgs) for pkgs in self._research_pkgs.values()))
+        n = max(n, max(len(pkgs) for pkgs in self._thirdparty_py.values()))
+        n = max(n, max(len(pkgs) for pkgs in self._thirdparty.values()))
+        n = max(n, len(self._pythons))
+        return n
+
+    def add_cfg(self, cfg):
+        code = (cfg.code.name, cfg.code.commit, cfg.code.dirty)
+        self._code.add(code)
+        if cfg.code.dirty:
+            self.dirty_pkgs.add(cfg.code.name)
+
+        for pkg_name, pkg_cfg in cfg.research_pkgs._branches:
+            self._research_pkgs.setdefault(pkg_name, set())
+            pkg_info = PkgInfo.from_cfg(pkg_cfg)
+            if pkg_info.dirty:
+                self.dirty_pkgs.add(pkg_name)
+            self._research_pkgs[pkg_name].add(pkg_info)
+
+        for pkg_name, pkg_cfg in cfg.thirdparty_py._branches:
+            self._thirdparty_py.setdefault(pkg_name, set())
+            pkg_info = PkgInfo.from_cfg(pkg_cfg)
+            if pkg_info.dirty:
+                self.dirty_pkgs.add(pkg_name)
+            self._thirdparty_py[pkg_name].add(pkg_info)
+
+        for pkg_name, pkg_cfg in cfg.thirdparty._branches:
+            self._thirdparty.setdefault(pkg_name, set())
+            pkg_info = PkgInfo.from_cfg(pkg_cfg)
+            if pkg_info.dirty:
+                self.dirty_pkgs.add(pkg_name)
+            self._thirdparty[pkg_name].add(pkg_info)
+
+        self._pythons.add((cfg.platform.python.implementation,
+                           cfg.platform.python.version,
+                           cfg.platform.python.build,
+                           cfg.platform.python.compiler))
+
+    def message(self):
+        s = ''
+
+        # code text
+        if len(self.dirty_pkgs) == 0:
+            s += ('All the code involved in the cluster computation was commited during job execution.\n')
+        else:
+            s += ('Some code involved in the cluster computation was not commited.\n'
+                  'The following repository are in dirty state: {}.\n'.format(
+                  ', '.join([name for name in self.dirty_pkgs])))
+        if self.tracks() == 1:
+            s += ('Every job was run with the same code version.\n')
+        else:
+            s += ('At least {} different versions of the code were used to compute the cluster jobs.\n'.format(self.tracks()) +
+                  'No job was computed with more than one version.\n')
+        s += '\n'
+
+        s += 'The cluster jobs were launched with commit{}: '.format('s' if len(self._code) > 1 else '')
+        s += ', '.join('{}{}'.format(code_commit, ' (dirty)' if code_dirty else '')
+                       for code_name, code_commit, code_dirty in self._code)
+        s += '.\n\n'
+
+        # research package text
+        s += 'Installed research packages during cluster jobs execution:\n'
+        max_name = max(len(pkg_name) for pkg_name in self._research_pkgs.keys())
+        for pkg_name, pkgs in self._research_pkgs.items():
+            s += '    {}{} '.format(pkg_name, ' '*(max_name - len(pkg_name)))
+            s += ', '.join(pkg.desc() for pkg in pkgs)
+            s += '\n'
+        s += '\n'
+
+        # third-party python packages
+        s += 'Installed third-party python packages during cluster jobs execution:\n'
+        for pkg_name, pkgs in self._thirdparty_py.items():
+            s += '    {} '.format(pkg_name)
+            s += ', '.join(pkg.desc() for pkg in pkgs)
+            s += '\n'
+        s += '\n'
+
+        # non-python third-party packages
+        s += 'Installed third-party non-python packages during cluster jobs execution:\n'
+        for pkg_name, pkgs in self._thirdparty.items():
+            s += '    {} '.format(pkg_name)
+            s += ', '.join(pkg.desc() for pkg in pkgs)
+            s += '\n'
+        s += '\n'
+
+        # # platform info
+        assert len(self._pythons) == 1
+        implementation, version, build, compiler = list(self._pythons)[0]
+        s += 'Cluster jobs were executed with:\n'
+        s += '    {} {} {}\n'.format(implementation, version, build)
+        s += '    [{}]\n'.format(compiler)
+        s += '\n'
+
+        s += 'This notebook was executed with code commit: {}{}.\n'.format(
+             self._current_commit, ' (dirty)' if self._current_dirty else '')
+
+        return s
