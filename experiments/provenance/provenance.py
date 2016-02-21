@@ -181,7 +181,7 @@ class ProvenanceData(object):
 
     def __init__(self, name, code_dir,
                  research_pkgs=(), thirdparty_py=(), thirdparty=(),
-                 timestamp=None, platform=None, env=None):
+                 timestamp=None, platform=None, env=None, populate=True):
         self.timestamp = timestamp
         if self.timestamp is None:
             self.timestamp = time.time()
@@ -205,18 +205,22 @@ class ProvenanceData(object):
         self._thirdparty_py = []
         self._thirdparty    = []
 
-        self.register_code(name, code_dir)
-        for pkg in research_pkgs:
+        if populate:
+            self.populate()
+
+    def populate(self):
+        self.register_code(*self._code_desc)
+        for pkg in self._research_pkgs_desc:
             if isinstance(pkg, scicfg.string):
                 pkg = PkgDesc(pkg)
             self.register_py_package(pkg, research=True)
 
-        for pkg in thirdparty_py:
+        for pkg in self._thirdparty_py_desc:
             if isinstance(pkg, scicfg.string):
                 pkg = PkgDesc(pkg)
             self.register_py_package(pkg, research=False)
 
-        for pkg in thirdparty:
+        for pkg in self._thirdparty_desc:
             self.register_thirdparty(pkg)
 
     @property

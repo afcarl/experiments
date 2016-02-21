@@ -78,7 +78,7 @@ class DataExploration(Data):
         self.key = self.job.jobcfg.key
         if load:
             self.load()
-            self.meta       = self.data['meta']
+            self.meta       = self.data.get('meta', {})
             self.m_channels = self.data['m_channels']
             self.s_channels = self.data['s_channels']
 
@@ -123,13 +123,12 @@ class DataSensoryExploration(DataExploration):
         self.m_channels = history.core.meta['m_channels']
         self.s_channels = history.core.meta['s_channels']
 
-        self.data = {'ticks': [], 's_signals': [],
+        self.data = {'ticks': [], 's_signals': [], 's_vectors': [],
                      's_channels': self.s_channels, 'm_channels': self.m_channels}
 
         for t, entry in enumerate(history.core.entries):
             if entry is not None:
-                feedback = entry['data']['feedback']
-                s_signal = feedback['s_signal']
+                s_signal = entry['data']['s_signal']
                 self.data['ticks'].append(t)
                 self.data['s_signals'].append(s_signal)
                 self.data['s_vectors'].append(tools.to_vector(s_signal, self.s_channels))
