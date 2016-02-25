@@ -5,7 +5,6 @@ import shapely
 import shapely.ops
 import shapely.geometry
 
-import learners
 from learners import tools
 
 from ..tools import chrono

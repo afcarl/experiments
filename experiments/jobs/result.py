@@ -1,14 +1,11 @@
 import numbers
 import collections
-import random
 
 import scicfg
-import learners
 
 from . import basejobs
 from .keys import JobKey, expkey
 from ..expcfg import hardware_cfg
-from .exploration import ex_hardware_cfg
 
 
 job_desc_cfg = scicfg.SciConfig(strict=True)

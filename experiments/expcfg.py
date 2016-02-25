@@ -4,7 +4,6 @@ import collections
 import numbers
 
 import scicfg
-import learners
 
 
 desc = scicfg.SciConfig(strict=True)

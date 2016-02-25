@@ -1,10 +1,7 @@
-import os
-
 from environments import tools
 from clusterjobs import context, jobgroup
 
 from ..tools import chrono
-from .. import jobs
 from ..execute import populate_grp, flatten_exps
 
 _already_loaded = {}
@@ -53,7 +50,7 @@ class DataResults(Data):
                      'rep_avgs':[[] for _ in range(self.rep)],
                      'rep_stds':[[] for _ in range(self.rep)]}
 
-        for t, entry in enumerate(history.core.entries):
+        for entry in history.core.entries:
             if entry is not None:
                 self.data['ticks'].append(entry['t'])
                 for key in ['avg', 'std']:

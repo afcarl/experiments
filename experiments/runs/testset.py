@@ -2,10 +2,6 @@ from __future__ import print_function, division, absolute_import
 
 from clusterjobs import datafile
 
-import environments
-import explorers
-from environments import tools
-
 from ..tools import chrono
 
 

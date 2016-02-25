@@ -56,7 +56,7 @@ def compile_results(cfg):
 
         test_history.close()
 
-    for t, entry in enumerate(results.core.entries):
+    for entry in results.core.entries:
         if entry is not None:
             entry['data']['avg']      = np.average(entry['data']['error_avgs'])
             entry['data']['std']      = np.std(entry['data']['error_avgs'])

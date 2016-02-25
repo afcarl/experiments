@@ -1,13 +1,10 @@
 
 from __future__ import print_function, absolute_import
 import random
-import sys
 
-import scicfg
 from clusterjobs import datafile
 import environments
 import explorers
-import learners
 
 from ..tools import chrono, autosave
 from .. import provenance
@@ -37,7 +34,7 @@ def same_cfg(cfg_a, cfg_b):
         for key_b, v_b in cfg_b._items():
             assert cfg_a[key_b] == v_b
         return True
-    except (KeyError, AssertionError) as e:
+    except (KeyError, AssertionError):
         return False
 
 def load_existing_datafile(cfg, core_keys):

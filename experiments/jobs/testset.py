@@ -1,11 +1,10 @@
-import numbers
 import collections
 import random
 
 import scicfg
 
 from . import basejobs
-from .keys import JobKey, expkey
+from .keys import expkey
 from ..expcfg import hardware_cfg
 
 
